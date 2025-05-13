@@ -1,5 +1,7 @@
 import './App.css'
 import '@ant-design/v5-patch-for-react-19';
+import "leaflet/dist/leaflet.css";
+
 
 import {Button, Flex, Layout, Typography} from 'antd';
 import {useEffect, useState,} from "react";
@@ -13,6 +15,8 @@ import {Dropdown} from 'antd';
 import {Outlet, Route, Routes, useNavigate} from "react-router";
 import {Colors} from "./colors";
 import {Footer} from "./layouts/Footer/Footer.tsx";
+import {MapContainer, Marker, Popup, TileLayer} from 'react-leaflet';
+
 
 const headerStyle: React.CSSProperties = {
     textAlign: 'center',
@@ -29,6 +33,19 @@ const contentStyle: React.CSSProperties = {
     textAlign: 'center',
     minHeight: 120,
     width: '100%',
+    height: '100%',
+    color: '#fff',
+    display: 'flex',
+    backgroundColor: Colors.RED_1,
+};
+
+
+const mapContentStyle: React.CSSProperties = {
+    textAlign: 'center',
+    minHeight: 120,
+    width: '100%',
+    display: 'flex',
+    height: '100%',
     color: '#fff',
     backgroundColor: Colors.RED_1,
 };
@@ -54,7 +71,7 @@ interface MKContentProps {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const MKContent = (_: MKContentProps) => {
     return <Content style={contentStyle}>
-        <Outlet />
+        <Outlet/>
     </Content>
 }
 
@@ -62,9 +79,9 @@ interface MKContent_UserProps {
     initInfo?: Info
 }
 
-const MKContent_User:React.FC<MKContent_UserProps> = () => {
+const MKContent_User: React.FC<MKContent_UserProps> = () => {
     return <Content style={contentStyle}>
-        <Outlet />
+        <Outlet/>
     </Content>
 }
 
@@ -78,14 +95,6 @@ interface MKHeaderProps {
 const mkServerUrl = "http://localhost:8080"
 
 const items: MenuProps['items'] = [
-    // {
-    //     key: '/',
-    //     label: 'My Account',
-    //     disabled: true,
-    // },
-    // {
-    //     type: 'divider',
-    // },
     {
         key: '/user',
         label: 'Profile',
@@ -93,7 +102,7 @@ const items: MenuProps['items'] = [
     {
         key: '/user/settings',
         label: 'Settings',
-    },    {
+    }, {
         key: '/logout',
         label: 'Logout',
     },
@@ -133,7 +142,8 @@ const MKHeader = ({initInfo}: MKHeaderProps) => {
                         </Flex>
                     </Dropdown>
                 </> :
-                <Button style={{color:"white"}} type="primary" href={mkServerUrl + "/auth/google/login"}>Google Login</Button>}
+                <Button style={{color: "white"}} type="primary" href={mkServerUrl + "/auth/google/login"}>Google
+                    Login</Button>}
         </Flex>
     </Header>
 }
@@ -179,8 +189,27 @@ function Logout(props: { logout: () => Promise<void> }) {
 }
 
 
-
-
+function MapA() {
+    return <Content style={{...contentStyle, backgroundColor: 'black'}}>
+        <MapContainer style={{...mapContentStyle, backgroundColor: 'black'}}
+                      zoom={13}
+                      center={[1.2868108, 103.8545349]}
+                      scrollWheelZoom={false}
+                      fadeAnimation={true}
+                      markerZoomAnimation={true}
+        >
+            <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+            <Marker position={[1.2868108, 103.8545349]}>
+                <Popup>
+                    A pretty CSS3 popup. <br/> Easily customizable.
+                </Popup>
+            </Marker>
+            <a>aa</a>
+        </MapContainer></Content>;
+}
 
 function App() {
     const [initInfo, setInitInfo] = useState<Info | undefined>()
@@ -195,6 +224,12 @@ function App() {
         setInitInfo(await Ping())
     }
 
+    // return <Layout style={layoutStyle}>
+    //     <MKHeader initInfo={initInfo} logout={logout}></MKHeader>
+    //     <MapA></MapA>
+    //
+    //     <Footer/>
+    // </Layout>;
     return (
         <Layout style={layoutStyle}>
             <MKHeader initInfo={initInfo} logout={logout}></MKHeader>
@@ -207,11 +242,15 @@ function App() {
                         <Route path="profile" element={<Typography>USERPROFILE</Typography>}/>
                         <Route path="settings" element={<Typography>USERSETTINGS</Typography>}/>
                     </Route>
-                    <Route path="logout" element={<Logout logout={logout} />}/>
-                    <Route path="map" element={<Typography>MAP</Typography>}/>
+                    <Route path="logout" element={<Logout logout={logout}/>}/>
+                    <Route path="map" element={<MapA></MapA>}/>
+                    <Route path="edit" element={<Outlet/>}>
+                        <Route path="menu" element={<><a>EDIT MENU </a></>}/>
+                        <Route path="store_form" element={<><a>NEW STORE</a></>}/>
+                    </Route>
                 </Route>
             </Routes>
-            <Footer />
+            <Footer/>
         </Layout>
     )
 }
