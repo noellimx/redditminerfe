@@ -8,10 +8,10 @@ import {UserOutlined} from "@ant-design/icons";
 const {Header, Footer, Content} = Layout;
 
 import React from 'react';
-import { SettingOutlined} from '@ant-design/icons';
 import type {MenuProps} from 'antd';
 import {Dropdown} from 'antd';
 import {Outlet, Route, Routes, useNavigate} from "react-router";
+import {Colors} from "./colors";
 
 const headerStyle: React.CSSProperties = {
     textAlign: 'center',
@@ -19,7 +19,7 @@ const headerStyle: React.CSSProperties = {
     color: '#fff',
     height: 64,
     lineHeight: '64px',
-    backgroundColor: '#4096ff',
+    backgroundColor: Colors.RED_5,
     width: '100%',
     display: 'flex',
 };
@@ -29,14 +29,14 @@ const contentStyle: React.CSSProperties = {
     minHeight: 120,
     width: '100%',
     color: '#fff',
-    backgroundColor: '#0958d9',
+    backgroundColor: Colors.RED_1,
 };
 
 const footerStyle: React.CSSProperties = {
     textAlign: 'center',
     width: '100%',
     color: '#fff',
-    backgroundColor: '#4096ff',
+    backgroundColor: Colors.RED_5,
 };
 
 const layoutStyle = {
@@ -99,11 +99,14 @@ const items: MenuProps['items'] = [
     {
         key: '/user/settings',
         label: 'Settings',
+    },    {
+        key: '/logout',
+        label: 'Logout',
     },
 ];
 
 
-const MKHeader = ({initInfo, logout}: MKHeaderProps) => {
+const MKHeader = ({initInfo}: MKHeaderProps) => {
     const user_info = initInfo?.user_info;
 
     const isSessionActive = !(user_info == undefined || initInfo == null);
@@ -117,7 +120,7 @@ const MKHeader = ({initInfo, logout}: MKHeaderProps) => {
                 <>
 
                     <Dropdown menu={{
-                        items, onClick:
+                        items, onClick: // dont remove
                             (e) => {
                                 const key = e.key
                                 navigate(key)
@@ -135,7 +138,6 @@ const MKHeader = ({initInfo, logout}: MKHeaderProps) => {
                             </Typography>
                         </Flex>
                     </Dropdown>
-                    <Button type="primary" onClick={logout}>Logout</Button>
                 </> :
                 <Button style={{color:"white"}} type="primary" href={mkServerUrl + "/auth/google/login"}>Google Login</Button>}
         </Flex>
@@ -159,7 +161,7 @@ const Ping = async () => {
 }
 
 
-const Logout = async () => {
+const LogoutC = async () => {
     const url = mkServerUrl + "/revoke_session";
     try {
         const response = await fetch(url, {method: "POST", credentials: 'include'});
@@ -175,6 +177,13 @@ const Logout = async () => {
     }
 }
 
+function Logout(props: { logout: () => Promise<void> }) {
+    useEffect(() => {
+        props.logout();
+    }, [props])
+    return null;
+}
+
 function App() {
     const [initInfo, setInitInfo] = useState<Info | undefined>()
     useEffect(() => {
@@ -184,7 +193,7 @@ function App() {
     }, [])
 
     const logout = async () => {
-        Logout()
+        LogoutC()
         setInitInfo(await Ping())
     }
 
@@ -202,6 +211,7 @@ function App() {
                         <Route path="profile" element={<Typography>USERPROFILE</Typography>}/>
                         <Route path="settings" element={<Typography>USERSETTINGS</Typography>}/>
                     </Route>
+                    <Route path="logout" element={<Logout logout={logout} />}/>
                 </Route>
             </Routes>
 
