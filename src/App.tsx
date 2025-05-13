@@ -193,7 +193,7 @@ function App() {
             <MKHeader initInfo={initInfo} logout={logout}></MKHeader>
 
             <Routes>
-                <Route path="" element={<MKContent initInfo={initInfo}></MKContent>}>
+                <Route path="*" element={<MKContent initInfo={initInfo}></MKContent>}>
                     <Route index element={<Typography>INDEX</Typography>}/>
                     <Route path="settings" element={<Typography>SETTINGS</Typography>}/>
 
@@ -203,7 +203,6 @@ function App() {
                         <Route path="settings" element={<Typography>USERSETTINGS</Typography>}/>
                     </Route>
                 </Route>
-
             </Routes>
 
 
