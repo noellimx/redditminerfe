@@ -2,7 +2,7 @@ import './App.css'
 import '@ant-design/v5-patch-for-react-19';
 
 import {Button, Layout, Space} from 'antd';
-import {useEffect, useState} from "react";
+import {useEffect, useState, } from "react";
 
 const {Header, Footer, Content} = Layout;
 
@@ -65,6 +65,8 @@ interface MKHeaderProps {
     logout: () => void
 }
 
+
+const mkServerUrl = "http://localhost:8080"
 const MKHeader = ({initInfo, logout}: MKHeaderProps) => {
     const user_info = initInfo?.user_info;
 
@@ -73,15 +75,15 @@ const MKHeader = ({initInfo, logout}: MKHeaderProps) => {
     console.log(`user_info${user_info} isSessionActive${isSessionActive}`)
     return <Header style={headerStyle}>
         <Space>
-            {JSON.stringify(initInfo, null, 2)}
-            {isSessionActive ? <Button type="primary" onClick={logout}>Logout</Button> :
-                <Button type="link" href={"http://localhost:8080/auth/google/login"}>Google Login</Button>}
+
+            {isSessionActive ?<> {JSON.stringify(initInfo, null, 2)}<Button type="primary" onClick={logout}>Logout</Button> </> :
+                <Button type="link" href={mkServerUrl + "/auth/google/login"}>Google Login</Button>}
         </Space>
     </Header>
 }
 
 const Ping = async () => {
-    const url = "http://localhost:8080/ping";
+    const url = mkServerUrl + "/ping";
     try {
         const response = await fetch(url, {credentials: 'include'});
         if (!response.ok) {
@@ -99,18 +101,30 @@ const Ping = async () => {
 const PingMustFailSession = () => {
     return {...sampleInfo, "user_info": null}
 };
-const Logout = () => true
+
+const Logout = async () => {
+    const url = mkServerUrl + "/revoke_session";
+    try {
+        const response = await fetch(url, {method:"POST", credentials: 'include'});
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+
+        const json = await response.json();
+        console.log(json);
+        return json;
+    } catch (error) {
+        if (error instanceof Error) console.error(error.message);
+    }
+}
 
 function App() {
-    console.log(`${JSON.stringify(import.meta.env)}`)
-
     const [initInfo, setInitInfo] = useState<Info | undefined>()
     useEffect(() => {
         (async () => {
             setInitInfo(await Ping())
         })();
     }, [])
-
 
     const logout = () => {
         Logout()
