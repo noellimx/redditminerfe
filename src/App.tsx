@@ -198,18 +198,17 @@ function App() {
     return (
         <Layout style={layoutStyle}>
             <MKHeader initInfo={initInfo} logout={logout}></MKHeader>
-
             <Routes>
                 <Route path="*" element={<MKContent initInfo={initInfo}></MKContent>}>
                     <Route index element={<Typography>INDEX</Typography>}/>
                     <Route path="settings" element={<Typography>SETTINGS</Typography>}/>
-
                     <Route path="user" element={<MKContent_User initInfo={initInfo}></MKContent_User>}>
                         <Route index element={<Typography>USERPROFILE (INDEX)</Typography>}/>
                         <Route path="profile" element={<Typography>USERPROFILE</Typography>}/>
                         <Route path="settings" element={<Typography>USERSETTINGS</Typography>}/>
                     </Route>
                     <Route path="logout" element={<Logout logout={logout} />}/>
+                    <Route path="map" element={<Typography>MAP</Typography>}/>
                 </Route>
             </Routes>
             <Footer />
