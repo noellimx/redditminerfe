@@ -5,13 +5,14 @@ import {Button, Flex, Layout, Typography} from 'antd';
 import {useEffect, useState,} from "react";
 import {UserOutlined} from "@ant-design/icons";
 
-const {Header, Footer, Content} = Layout;
+const {Header, Content} = Layout;
 
 import React from 'react';
 import type {MenuProps} from 'antd';
 import {Dropdown} from 'antd';
 import {Outlet, Route, Routes, useNavigate} from "react-router";
 import {Colors} from "./colors";
+import {Footer} from "./layouts/Footer/Footer.tsx";
 
 const headerStyle: React.CSSProperties = {
     textAlign: 'center',
@@ -30,13 +31,6 @@ const contentStyle: React.CSSProperties = {
     width: '100%',
     color: '#fff',
     backgroundColor: Colors.RED_1,
-};
-
-const footerStyle: React.CSSProperties = {
-    textAlign: 'center',
-    width: '100%',
-    color: '#fff',
-    backgroundColor: Colors.RED_5,
 };
 
 const layoutStyle = {
@@ -184,6 +178,10 @@ function Logout(props: { logout: () => Promise<void> }) {
     return null;
 }
 
+
+
+
+
 function App() {
     const [initInfo, setInitInfo] = useState<Info | undefined>()
     useEffect(() => {
@@ -214,9 +212,7 @@ function App() {
                     <Route path="logout" element={<Logout logout={logout} />}/>
                 </Route>
             </Routes>
-
-
-            <Footer style={footerStyle}>Footer</Footer>
+            <Footer />
         </Layout>
     )
 }
