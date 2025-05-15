@@ -18,6 +18,7 @@ export const contentStyle: React.CSSProperties = {
     width: '100%',
     height: '100%',
     color: '#fff',
+    overflow: 'scroll',
     display: 'flex',
     backgroundColor: Colors.RED_1,
 };

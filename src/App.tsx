@@ -3,22 +3,18 @@ import '@ant-design/v5-patch-for-react-19';
 import "leaflet/dist/leaflet.css";
 
 
-import {Button, Flex, Layout, Typography} from 'antd';
-import {useEffect, useState,} from "react";
-import {UserOutlined} from "@ant-design/icons";
-
-const {Header, Content} = Layout;
-
-import React from 'react';
 import type {MenuProps} from 'antd';
-import {Dropdown} from 'antd';
+import {Button, Dropdown, Flex, Layout, Typography} from 'antd';
+import React, {useEffect, useState,} from "react";
+import {UserOutlined} from "@ant-design/icons";
 import {Outlet, Route, Routes, useNavigate} from "react-router";
 import {Footer} from "./layouts/Footer/Footer.tsx";
 import {contentStyle, headerStyle} from "./styles/styles.ts";
 import {MakanMap} from "./pages/MakanMap/MakanMap.tsx";
+import type {Info} from "./store";
+import {StallFormComponent} from "./pages/MakanFoodStoreForm/MakanFoodStoreForm.tsx";
 
-
-
+const {Header, Content} = Layout;
 
 
 const layoutStyle = {
@@ -28,11 +24,6 @@ const layoutStyle = {
 };
 
 
-// const sampleInfo: Info = {"login_urls": {"google": "/auth/google/login"}, "user_info": {"Id": 0}};
-type Info = {
-    "login_urls": { [provider: string]: /*url*/string }
-    "user_info": { Id: number } | null
-}
 
 interface MKContentProps {
     initInfo?: Info
@@ -85,8 +76,6 @@ const MKHeader = ({initInfo}: MKHeaderProps) => {
 
     const isSessionActive = !(user_info == undefined || initInfo == null);
 
-    console.log(`user_info${user_info} isSessionActive${isSessionActive}`)
-
     const navigate = useNavigate()
     return <Header style={headerStyle}>
         <Flex style={{justifyContent: 'end', width: '100%', alignItems: 'center', paddingRight: "10px", gap: "10px"}}>
@@ -127,9 +116,7 @@ const Ping = async () => {
             throw new Error(`Response status: ${response.status}`);
         }
 
-        const json = await response.json();
-        console.log(json);
-        return json;
+        return await response.json(); // todo: need await??
     } catch (error) {
         if (error instanceof Error) console.error(error.message);
     }
@@ -144,9 +131,7 @@ const LogoutC = async () => {
             throw new Error(`Response status: ${response.status}`);
         }
 
-        const json = await response.json();
-        console.log(json);
-        return json;
+        return await response.json(); // todo: need await??
     } catch (error) {
         if (error instanceof Error) console.error(error.message);
     }
@@ -175,12 +160,6 @@ function App() {
         setInitInfo(await Ping())
     }
 
-    // return <Layout style={layoutStyle}>
-    //     <MKHeader initInfo={initInfo} logout={logout}></MKHeader>
-    //     <MapA></MapA>
-    //
-    //     <Footer/>
-    // </Layout>;
     return (
         <Layout style={layoutStyle}>
             <MKHeader initInfo={initInfo} logout={logout}></MKHeader>
@@ -197,7 +176,7 @@ function App() {
                     <Route path="map" element={<MakanMap></MakanMap>}/>
                     <Route path="edit" element={<Outlet/>}>
                         <Route path="menu" element={<><a>EDIT MENU </a></>}/>
-                        <Route path="store_form" element={<><a>NEW STORE</a></>}/>
+                        <Route path="store_form" element={<StallFormComponent initInfo={initInfo}>NEW FOOD STORE</StallFormComponent>}/>
                     </Route>
                 </Route>
             </Routes>
