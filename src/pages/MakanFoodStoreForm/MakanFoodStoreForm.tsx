@@ -1,10 +1,10 @@
 import type {Info} from "../../store";
 import {
     Button, Card,
-    Divider,
     Form, type FormProps,
-    Input,
+    Input, Modal,
     Select, Space, Typography,
+    Divider,
 } from 'antd';
 import {useEffect} from "react";
 import {FileTextOutlined, MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
@@ -38,6 +38,17 @@ export function StallFormComponent({initInfo}: FormStoreProps) {
     const onFinish: FormProps<FieldForms>['onFinish'] = (values) => {
         console.log(`valueessss ${JSON.stringify(values)}`);
         console.log(form.getFieldsValue());
+
+        form.resetFields();
+        Modal.info({
+            title: '',
+            content: (
+                <div>
+                    Success!
+                </div>
+            ),
+            onOk() {},
+        })
     }
 
     return (
