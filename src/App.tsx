@@ -7,7 +7,7 @@ import type {MenuProps} from 'antd';
 import {Button, Dropdown, Flex, Layout, Typography} from 'antd';
 import React, {useEffect, useState,} from "react";
 import {UserOutlined} from "@ant-design/icons";
-import {Outlet, Route, Routes, useNavigate} from "react-router";
+import {Outlet, Route, Routes, useLocation, useNavigate} from "react-router";
 import {Footer} from "./layouts/Footer/Footer.tsx";
 import {contentStyle, headerStyle} from "./styles/styles.ts";
 import {MakanMap} from "./pages/MakanMap/MakanMap.tsx";
@@ -81,7 +81,6 @@ const MKHeader = ({initInfo}: MKHeaderProps) => {
         <Flex style={{justifyContent: 'end', width: '100%', alignItems: 'center', paddingRight: "10px", gap: "10px"}}>
             {isSessionActive ?
                 <>
-
                     <Dropdown menu={{
                         items, onClick: // dont remove
                             (e) => {
@@ -131,16 +130,17 @@ const LogoutC = async () => {
             throw new Error(`Response status: ${response.status}`);
         }
 
-        return await response.json(); // todo: need await??
+        return; // todo: need await??
     } catch (error) {
         if (error instanceof Error) console.error(error.message);
     }
 }
 
 function Logout(props: { logout: () => Promise<void> }) {
+    const {logout} = props;
     useEffect(() => {
-        props.logout();
-    }, [props])
+        logout();
+    }, [logout])
     return null;
 }
 
@@ -148,16 +148,26 @@ function Logout(props: { logout: () => Promise<void> }) {
 
 
 function App() {
-    const [initInfo, setInitInfo] = useState<Info | undefined>()
+    const [initInfo, setInitInfo] = useState<Info | undefined>();
+    const navigate = useNavigate();
+    const location = useLocation();
+
     useEffect(() => {
         (async () => {
+            console.log("setting info")
             setInitInfo(await Ping())
         })();
-    }, [])
+    }, [location.pathname])
 
     const logout = async () => {
-        LogoutC()
-        setInitInfo(await Ping())
+        console.log("logout")
+        try {
+            LogoutC()
+            navigate("/")
+        }catch (error) {
+           const e = error as Error;
+           console.error(e);
+        }
     }
 
     return (
