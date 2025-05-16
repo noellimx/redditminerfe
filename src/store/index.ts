@@ -5,4 +5,5 @@
 export type Info = {
     "login_urls": { [provider: string]: /*url*/string }
     "user_info": { Id: number } | null
+    "server_url" : string
 }

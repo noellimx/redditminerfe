@@ -13,6 +13,7 @@ import {contentStyle, headerStyle} from "./styles/styles.ts";
 import {MakanMap} from "./pages/MakanMap/MakanMap.tsx";
 import type {Info} from "./store";
 import {StallFormComponent} from "./pages/MakanFoodStoreForm/MakanFoodStoreForm.tsx";
+import {GetStall, LogoutC, Ping} from "./client/https.ts";
 
 const {Header, Content} = Layout;
 
@@ -108,34 +109,6 @@ const MKHeader = ({initInfo}: MKHeaderProps) => {
     </Header>
 }
 
-const Ping = async () => {
-    const url = mkServerUrl + "/ping";
-    try {
-        const response = await fetch(url, {credentials: 'include'});
-        if (!response.ok) {
-            throw new Error(`Response status: ${response.status}`);
-        }
-
-        return await response.json(); // todo: need await??
-    } catch (error) {
-        if (error instanceof Error) console.error(error.message);
-    }
-}
-
-
-const LogoutC = async () => {
-    const url = mkServerUrl + "/revoke_session";
-    try {
-        const response = await fetch(url, {method: "POST", credentials: 'include'});
-        if (!response.ok) {
-            throw new Error(`Response status: ${response.status}`);
-        }
-
-        return await response.json(); // todo: need await??
-    } catch (error) {
-        if (error instanceof Error) console.error(error.message);
-    }
-}
 
 function Logout(props: { logout: () => Promise<void> }) {
     useEffect(() => {
@@ -151,13 +124,14 @@ function App() {
     const [initInfo, setInitInfo] = useState<Info | undefined>()
     useEffect(() => {
         (async () => {
-            setInitInfo(await Ping())
+            setInitInfo(await Ping(mkServerUrl))
+
         })();
     }, [])
 
     const logout = async () => {
-        LogoutC()
-        setInitInfo(await Ping())
+        LogoutC(mkServerUrl)
+        setInitInfo(await Ping(mkServerUrl))
     }
 
     return (

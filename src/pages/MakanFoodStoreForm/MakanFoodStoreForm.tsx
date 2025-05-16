@@ -9,17 +9,14 @@ import {
 import {useEffect} from "react";
 import {FileTextOutlined, MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
 import {FloatButton} from "antd";
-
+import {AddStall, type FieldForms} from "../../client/https.ts";
 
 type FormStoreProps = {
     initInfo?: Info
     children: React.ReactNode
 }
-type FieldForms = {
-    foo?: string;
-    bar?: string;
-    asfd?: string;
-};
+
+
 
 
 export function StallFormComponent({initInfo}: FormStoreProps) {
@@ -39,6 +36,10 @@ export function StallFormComponent({initInfo}: FormStoreProps) {
         console.log(`valueessss ${JSON.stringify(values)}`);
         console.log(form.getFieldsValue());
 
+
+        AddStall(initInfo.server_url, form.getFieldsValue());
+
+        return;
         form.resetFields();
         Modal.info({
             title: '',
@@ -47,7 +48,8 @@ export function StallFormComponent({initInfo}: FormStoreProps) {
                     Success!
                 </div>
             ),
-            onOk() {},
+            onOk() {
+            },
         })
     }
 
