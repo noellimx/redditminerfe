@@ -12,7 +12,8 @@ import {Footer} from "./layouts/Footer/Footer.tsx";
 import {contentStyle, headerStyle} from "./styles/styles.ts";
 import {MakanMap} from "./pages/MakanMap/MakanMap.tsx";
 import type {Info} from "./store";
-import {StallFormComponent} from "./pages/MakanFoodStoreForm/MakanFoodStoreForm.tsx";
+import {OutletFormComponent} from "./pages/MakanFoodStoreForm/MakanFoodStoreForm.tsx";
+import {LogoutC, Ping} from "./client/https.ts";
 
 const {Header, Content} = Layout;
 
@@ -22,7 +23,6 @@ const layoutStyle = {
     overflow: 'hidden',
     height: '100vh',
 };
-
 
 
 interface MKContentProps {
@@ -107,34 +107,6 @@ const MKHeader = ({initInfo}: MKHeaderProps) => {
     </Header>
 }
 
-const Ping = async () => {
-    const url = mkServerUrl + "/ping";
-    try {
-        const response = await fetch(url, {credentials: 'include'});
-        if (!response.ok) {
-            throw new Error(`Response status: ${response.status}`);
-        }
-
-        return await response.json(); // todo: need await??
-    } catch (error) {
-        if (error instanceof Error) console.error(error.message);
-    }
-}
-
-
-const LogoutC = async () => {
-    const url = mkServerUrl + "/revoke_session";
-    try {
-        const response = await fetch(url, {method: "POST", credentials: 'include'});
-        if (!response.ok) {
-            throw new Error(`Response status: ${response.status}`);
-        }
-
-        return; // todo: need await??
-    } catch (error) {
-        if (error instanceof Error) console.error(error.message);
-    }
-}
 
 function Logout(props: { logout: () => Promise<void> }) {
     const {logout} = props;
@@ -145,8 +117,6 @@ function Logout(props: { logout: () => Promise<void> }) {
 }
 
 
-
-
 function App() {
     const [initInfo, setInitInfo] = useState<Info | undefined>();
     const navigate = useNavigate();
@@ -154,22 +124,23 @@ function App() {
 
     useEffect(() => {
         (async () => {
+            setInitInfo(await Ping(mkServerUrl))
+
             console.log("setting info")
-            setInitInfo(await Ping())
+            setInitInfo(await Ping(mkServerUrl))
         })();
     }, [location.pathname])
 
     const logout = async () => {
         console.log("logout")
         try {
-            LogoutC()
+            LogoutC(mkServerUrl)
             navigate("/")
-        }catch (error) {
-           const e = error as Error;
-           console.error(e);
+        } catch (error) {
+            const e = error as Error;
+            console.error(e);
         }
     }
-
     return (
         <Layout style={layoutStyle}>
             <MKHeader initInfo={initInfo} logout={logout}></MKHeader>
@@ -186,7 +157,8 @@ function App() {
                     <Route path="map" element={<MakanMap></MakanMap>}/>
                     <Route path="edit" element={<Outlet/>}>
                         <Route path="menu" element={<><a>EDIT MENU </a></>}/>
-                        <Route path="store_form" element={<StallFormComponent initInfo={initInfo}>NEW FOOD STORE</StallFormComponent>}/>
+                        <Route path="store_form"
+                               element={<OutletFormComponent initInfo={initInfo}>NEW FOOD STORE</OutletFormComponent>}/>
                     </Route>
                 </Route>
             </Routes>

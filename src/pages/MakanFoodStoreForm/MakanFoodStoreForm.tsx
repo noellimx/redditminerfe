@@ -9,22 +9,19 @@ import {
 import {useEffect} from "react";
 import {FileTextOutlined, MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
 import {FloatButton} from "antd";
-
+import {AddOutlet, type FieldForms} from "../../client/https.ts";
 
 type FormStoreProps = {
     initInfo?: Info
     children: React.ReactNode
 }
-type FieldForms = {
-    foo?: string;
-    bar?: string;
-    asfd?: string;
-};
 
 
-export function StallFormComponent({initInfo}: FormStoreProps) {
+export function OutletFormComponent({initInfo}: FormStoreProps) {
     const [form] = Form.useForm();
 
+
+    const outletForm = initInfo?.outlet_form;
     useEffect(() => {
         // form.setFieldValue("address","rdda")
     }, [form])
@@ -35,20 +32,45 @@ export function StallFormComponent({initInfo}: FormStoreProps) {
     }
 
 
-    const onFinish: FormProps<FieldForms>['onFinish'] = (values) => {
+    const onFinish: FormProps<FieldForms>['onFinish'] = async (values) => {
         console.log(`valueessss ${JSON.stringify(values)}`);
         console.log(form.getFieldsValue());
 
-        form.resetFields();
-        Modal.info({
-            title: '',
-            content: (
-                <div>
-                    Success!
-                </div>
-            ),
-            onOk() {},
-        })
+
+        try {
+            await AddOutlet(initInfo.server_url, form.getFieldsValue());
+
+            form.resetFields();
+
+
+            Modal.info({
+                title: '',
+                content: (
+                    <div>
+                        Success!
+                    </div>
+                ),
+                onOk() {
+                },
+            })
+
+        } catch (e) {
+
+            const ea = e as Error;
+            Modal.error({
+                title: '',
+                content: (
+                    <div>
+                        {ea.message}
+                    </div>
+                ),
+                onOk() {
+                },
+            })
+        }
+
+        return;
+
     }
 
     return (
@@ -71,12 +93,12 @@ export function StallFormComponent({initInfo}: FormStoreProps) {
                 style={{width: "80%", display: "flex", justifyContent: "center", flexDirection: "column"}}
                 onFinish={onFinish}
             >
-                <Divider>Stall</Divider>
-                <Form.Item label="Stall Name" name="outlet_name"
+                <Divider>Outlet</Divider>
+                <Form.Item label="Outlet Name" name="outlet_name"
                            rules={[{required: true, message: "Please enter outlet name"}]}>
                     <Input/>
                 </Form.Item>
-                <Form.Item label="Stall Type" name="outlet_type">
+                <Form.Item label="Outlet Type" name="outlet_type">
                     <Select>
                         <Select.Option value="Hawker Center"> Hawker Center </Select.Option>
                         <Select.Option value="Kopitiam"> Kopitiam </Select.Option>
@@ -84,9 +106,13 @@ export function StallFormComponent({initInfo}: FormStoreProps) {
                         <Select.Option value="Restaurant"> Restaurant </Select.Option>
                     </Select>
                 </Form.Item>
-                <Form.Item label="Product" name="product_name">
+                <Form.Item label="Product" name="product_name" rules={[{
+                    required: true,
+                }]}>
                     <Select>
-                        <Select.Option value="Hokkien Mee"> Hokkien Mee </Select.Option>
+                        {outletForm && outletForm.product_names.map(item => {
+                            return <Select.Option value={item}> {item} </Select.Option>
+                        })}
                     </Select>
                 </Form.Item>
                 <Divider>Location</Divider>
