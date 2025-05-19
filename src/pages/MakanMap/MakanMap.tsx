@@ -9,7 +9,7 @@ import {Button, Typography} from "antd";
 import {GoogleCircleFilled, LinkOutlined} from "@ant-design/icons";
 import L from 'leaflet';
 
-import pin from '../../../src/assets/location-pin.png';
+import pin from '../../../src/assets/location-pin.svg';
 
 const iconPerson = new L.Icon({
     iconUrl: pin,
