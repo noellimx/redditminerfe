@@ -54,7 +54,11 @@ interface MKHeaderProps {
 }
 
 
-const mkServerUrl = "http://localhost:8080"
+// const mkServerUrl = "http://localhost:8080"
+const mkServerUrl = import.meta.env.VITE_SERVER_URL
+
+console.log(`mkServerUrl ${mkServerUrl}`)
+
 
 const items: MenuProps['items'] = [
     {
@@ -141,6 +145,8 @@ function App() {
             console.error(e);
         }
     }
+
+    console.log(`VITE_SERVER_URL=${import.meta.env.VITE_SERVER_URL}`);
     return (
         <Layout style={layoutStyle}>
             <MKHeader initInfo={initInfo} logout={logout}></MKHeader>
