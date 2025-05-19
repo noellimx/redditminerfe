@@ -128,8 +128,7 @@ function App() {
 
     useEffect(() => {
         (async () => {
-            setInitInfo(await Ping(mkServerUrl))
-
+            // setInitInfo(await Ping(mkServerUrl))
             console.log("setting info")
             setInitInfo(await Ping(mkServerUrl))
         })();
