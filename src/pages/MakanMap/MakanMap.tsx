@@ -9,12 +9,11 @@ import {Button, Typography} from "antd";
 import {GoogleCircleFilled, LinkOutlined} from "@ant-design/icons";
 import L from 'leaflet';
 
-import pin from '../../../src/assets/arrow-down-long.svg';
+import pin from '../../../src/assets/noun-pin-3083030.svg';
 
 const iconPerson = new L.Icon({
     iconUrl: pin,
-    iconSize: new L.Point(60, 75),
-    className: 'leaflet-div-icon'
+    iconSize: new L.Point(40, 40),
 });
 
 const mapContentStyle: React.CSSProperties = {
