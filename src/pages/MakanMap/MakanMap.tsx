@@ -6,7 +6,7 @@ import {Content} from "antd/es/layout/layout";
 import {GetOutlet, type Outlet} from "../../client/https.ts";
 import type {Info} from "../../store";
 import {Button, Typography} from "antd";
-import {GoogleCircleFilled} from "@ant-design/icons";
+import {GoogleCircleFilled, LinkOutlined} from "@ant-design/icons";
 
 
 const mapContentStyle: React.CSSProperties = {
@@ -49,7 +49,7 @@ export function MakanMap({initInfo}: Props) {
             />
 
             {outlets.map(outlet => {
-                const {latlong, official_links, name, address,postal_code} = outlet;
+                const {latlong,review_links, official_links, name, address,postal_code} = outlet;
                 if (latlong == undefined || latlong == null) {
                     return <></>
                 }
@@ -69,6 +69,8 @@ export function MakanMap({initInfo}: Props) {
                                 return <a href={link}></a>
                             })}
                         </Typography>
+
+                        <Typography>Search</Typography>
                         <Button
 
                             style={{padding:'0px'}}
@@ -77,6 +79,18 @@ export function MakanMap({initInfo}: Props) {
                                 target="_blank">
                             <GoogleCircleFilled />
                         </Button>
+
+                        <Typography>Reviews</Typography>
+                        {review_links && review_links.map(link => {
+                            return           <Button
+                                style={{padding:'0px'}}
+                                type="link" htmlType="submit"
+                                href={link}
+                                target="_blank">
+                                <LinkOutlined />
+                            </Button>
+                        })}
+
                     </Popup>
                 </Marker>
             })}

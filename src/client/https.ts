@@ -72,6 +72,7 @@ export interface Outlet {
     "address": string
     "postal_code": string
     "official_links": string[]
+    "review_links": string[]
     "latlong"?: LatLong
 }
 

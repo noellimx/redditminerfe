@@ -163,12 +163,12 @@ export function OutletFormComponent({initInfo}: FormStoreProps) {
 
                 <Card style={{backgroundColor: "white"}}>
                     <Typography>Media / Reviews </Typography>
-                    <Form.List name="media_links">
+                    <Form.List name="review_links">
                         {(fields, {add, remove}) => (
                             <>
                                 {fields.map(({key, name, ...restField}) => (
                                     <Space.Compact className="form_item_media_links" key={key}
-                                                   style={{gap: "10px", display: 'flex', flexDirection: "column"}}>
+                                                   style={{gap: "10px", display: 'flex', flexDirection: "row"}}>
                                         <Form.Item
                                             {...restField}
                                             className={"form_item_review_links_textarea"}
