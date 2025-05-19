@@ -1,8 +1,12 @@
 import {MapContainer, Marker, Popup, TileLayer} from "react-leaflet";
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {Colors} from "../../colors";
 import {contentStyle} from "../../styles/styles.ts";
 import {Content} from "antd/es/layout/layout";
+import {GetOutlet, type Outlet} from "../../client/https.ts";
+import type {Info} from "../../store";
+import {Button, Typography} from "antd";
+import {GoogleCircleFilled} from "@ant-design/icons";
 
 
 const mapContentStyle: React.CSSProperties = {
@@ -15,7 +19,22 @@ const mapContentStyle: React.CSSProperties = {
     backgroundColor: Colors.RED_1,
 };
 
-export function MakanMap() {
+
+interface Props {
+    initInfo?: Info
+}
+
+export function MakanMap({initInfo}: Props) {
+    const [outlets, setOutlets] = useState<Outlet[]>([]);
+    useEffect(() => {
+        (async () => {
+            const outlets = await GetOutlet(initInfo ? initInfo.server_url : "")
+            console.log(`outlets ${JSON.stringify(outlets)}`);
+            setOutlets(outlets || []);
+        })();
+    }, [initInfo])
+
+
     return <Content style={{...contentStyle, backgroundColor: 'black'}}>
         <MapContainer style={{...mapContentStyle, backgroundColor: 'black'}}
                       zoom={13}
@@ -28,11 +47,39 @@ export function MakanMap() {
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
-            <Marker position={[1.2868108, 103.8545349]}>
-                <Popup>
-                    A pretty CSS3 popup. <br/> Easily customizable.
-                </Popup>
-            </Marker>
+
+            {outlets.map(outlet => {
+                const {latlong, official_links, name, address,postal_code} = outlet;
+                if (latlong == undefined || latlong == null) {
+                    return <></>
+                }
+
+                const {latitude, longitude} = latlong
+                console.log(latitude, longitude)
+                return <Marker position={[parseFloat(latitude), parseFloat(longitude)]}>
+                    <Popup>
+                        <Typography>
+                            {`Outlet Name: ${name}`}
+                        </Typography>
+                        <Typography>
+                            {address ? `Address: ${address}}` : `Address: ${postal_code}`}
+                        </Typography>
+                        <Typography>
+                            {official_links && official_links.map(link => {
+                                return <a href={link}></a>
+                            })}
+                        </Typography>
+                        <Button
+
+                            style={{padding:'0px'}}
+                            type="link" htmlType="submit"
+                                href={`https://www.google.com/search?q=${name}+${postal_code}`}
+                                target="_blank">
+                            <GoogleCircleFilled />
+                        </Button>
+                    </Popup>
+                </Marker>
+            })}
             <a>aa</a>
         </MapContainer></Content>;
 }

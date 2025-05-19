@@ -116,7 +116,7 @@ export function OutletFormComponent({initInfo}: FormStoreProps) {
                     </Select>
                 </Form.Item>
                 <Divider>Location</Divider>
-                <Form.Item label="Address" name="address" rules={[{max: 6}]}>
+                <Form.Item label="Address" name="address">
                     <Input/>
                 </Form.Item>
                 <Form.Item label="Postal Code" name={"postal_code"} rules={[{
@@ -168,17 +168,30 @@ export function OutletFormComponent({initInfo}: FormStoreProps) {
                             <>
                                 {fields.map(({key, name, ...restField}) => (
                                     <Space.Compact className="form_item_media_links" key={key}
-                                                   style={{gap: "10px", display: 'flex'}}>
+                                                   style={{gap: "10px", display: 'flex', flexDirection: "column"}}>
                                         <Form.Item
                                             {...restField}
-
-                                            className={"form_item_media_links_textarea"}
+                                            className={"form_item_review_links_textarea"}
                                             name={[name, 'value']}
                                             rules={[{required: true, message: "please fill or remove empty link"}]}
                                             style={{flex: 1}}
                                         >
                                             <Input.TextArea placeholder=""/>
                                         </Form.Item>
+
+                                        {/*<Form.Item*/}
+                                        {/*    {...restField}*/}
+                                        {/*    className={"form_item_review_links_textarea"}*/}
+                                        {/*    name={[name, 'source']}*/}
+                                        {/*    rules={[{required: true, message: "please include source for link"}]}*/}
+                                        {/*    style={{flex: 1}}*/}
+                                        {/*>*/}
+                                        {/*    <Select>*/}
+                                        {/*        {outletForm && outletForm.sources && outletForm.sources.map(item => {*/}
+                                        {/*            return <Select.Option value={item}> {item} </Select.Option>*/}
+                                        {/*        })}*/}
+                                        {/*    </Select>*/}
+                                        {/*</Form.Item>*/}
                                         <MinusCircleOutlined onClick={() => {
                                             console.log(`removing ${name}`)
                                             remove(name)

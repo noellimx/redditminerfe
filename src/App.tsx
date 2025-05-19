@@ -96,7 +96,7 @@ const MKHeader = ({initInfo}: MKHeaderProps) => {
                         }}>
                             <UserOutlined style={{maxHeight: "100%", fontSize: "20px"}}/>
                             <Typography style={{color: '#fff', fontSize: '16px', alignItems: 'center'}}>
-                                {JSON.stringify(initInfo?.user_info?.Id, null, 2)}
+                                {(initInfo?.user_info?.Gmails && initInfo?.user_info?.Gmails.length > 0) ? initInfo?.user_info?.Gmails[0] :JSON.stringify(initInfo?.user_info?.Id, null, 2)}
                             </Typography>
                         </Flex>
                     </Dropdown>
@@ -154,7 +154,7 @@ function App() {
                         <Route path="settings" element={<Typography>USERSETTINGS</Typography>}/>
                     </Route>
                     <Route path="logout" element={<Logout logout={logout}/>}/>
-                    <Route path="map" element={<MakanMap></MakanMap>}/>
+                    <Route path="map" element={<MakanMap initInfo={initInfo}></MakanMap>}/>
                     <Route path="edit" element={<Outlet/>}>
                         <Route path="menu" element={<><a>EDIT MENU </a></>}/>
                         <Route path="store_form"

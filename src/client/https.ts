@@ -62,3 +62,36 @@ export const AddOutlet = async (mkServerUrl: string, body: FieldForms) => {
 
     return await response.json(); // todo: need await??
 }
+
+export type LatLong = {
+    latitude: string
+    longitude: string
+}
+export interface Outlet {
+    "name": string
+    "address": string
+    "postal_code": string
+    "official_links": string[]
+    "latlong"?: LatLong
+}
+
+export const GetOutlet = async (mkServerUrl: string) => {
+    // body["product_name"] = "";
+    const url = mkServerUrl + "/outlets/";
+    const response = await fetch(url, {
+        method: "GET", credentials: 'include', headers: {},
+    });
+    if (!response.ok) {
+        console.error(`Response status: ${response.status}`);
+        throw new Error(`Response status: ${response.status}`);
+    }
+
+    const resp = await response.json() as {
+        data: {
+            outlets?: Outlet[];
+        }
+    };
+
+
+    return resp.data.outlets;
+}
