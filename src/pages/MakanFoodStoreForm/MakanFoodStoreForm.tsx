@@ -90,7 +90,7 @@ export function OutletFormComponent({initInfo}: FormStoreProps) {
                 layout="vertical"
                 initialValues={{size: "small"}}
                 size={"small"}
-                style={{width: "80%", display: "flex", justifyContent: "center", flexDirection: "column"}}
+                style={{width: "90%", display: "flex", justifyContent: "center", flexDirection: "column"}}
                 onFinish={onFinish}
             >
                 <Divider>Outlet</Divider>
