@@ -7,7 +7,15 @@ import {GetOutlet, type Outlet} from "../../client/https.ts";
 import type {Info} from "../../store";
 import {Button, Typography} from "antd";
 import {GoogleCircleFilled, LinkOutlined} from "@ant-design/icons";
+import L from 'leaflet';
 
+import pin from '../../../src/assets/location-pin.png';
+
+const iconPerson = new L.Icon({
+    iconUrl: pin,
+    iconSize: new L.Point(60, 75),
+    className: 'leaflet-div-icon'
+});
 
 const mapContentStyle: React.CSSProperties = {
     textAlign: 'center',
@@ -49,14 +57,14 @@ export function MakanMap({initInfo}: Props) {
             />
 
             {outlets.map(outlet => {
-                const {latlong,review_links, official_links, name, address,postal_code} = outlet;
+                const {latlong, review_links, official_links, name, address, postal_code} = outlet;
                 if (latlong == undefined || latlong == null) {
                     return <></>
                 }
 
                 const {latitude, longitude} = latlong
                 console.log(latitude, longitude)
-                return <Marker position={[parseFloat(latitude), parseFloat(longitude)]}>
+                return <Marker icon={iconPerson} position={[parseFloat(latitude), parseFloat(longitude)]}>
                     <Popup>
                         <Typography>
                             {`Outlet Name: ${name}`}
@@ -72,22 +80,21 @@ export function MakanMap({initInfo}: Props) {
 
                         <Typography>Search</Typography>
                         <Button
-
-                            style={{padding:'0px'}}
+                            style={{padding: '0px'}}
                             type="link" htmlType="submit"
-                                href={`https://www.google.com/search?q=${name}+${postal_code}`}
-                                target="_blank">
-                            <GoogleCircleFilled />
+                            href={`https://www.google.com/search?q=${name}+${postal_code}`}
+                            target="_blank">
+                            <GoogleCircleFilled/>
                         </Button>
 
                         <Typography>Reviews</Typography>
                         {review_links && review_links.map(link => {
-                            return           <Button
-                                style={{padding:'0px'}}
+                            return <Button
+                                style={{padding: '0px'}}
                                 type="link" htmlType="submit"
                                 href={link}
                                 target="_blank">
-                                <LinkOutlined />
+                                <LinkOutlined/>
                             </Button>
                         })}
 

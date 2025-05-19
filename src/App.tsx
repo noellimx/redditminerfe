@@ -81,6 +81,12 @@ const MKHeader = ({initInfo}: MKHeaderProps) => {
     const isSessionActive = !(user_info == undefined || initInfo == null);
 
     const navigate = useNavigate()
+
+    const [loggingIn, setLoggingIn] = useState<boolean>(false)
+
+    if (loggingIn) {
+        return  <Header style={headerStyle}><Typography>{"..."}</Typography></Header>
+    }
     return <Header style={headerStyle}>
         <Flex style={{justifyContent: 'end', width: '100%', alignItems: 'center', paddingRight: "10px", gap: "10px"}}>
             {isSessionActive ?
@@ -100,13 +106,15 @@ const MKHeader = ({initInfo}: MKHeaderProps) => {
                         }}>
                             <UserOutlined style={{maxHeight: "100%", fontSize: "20px"}}/>
                             <Typography style={{color: '#fff', fontSize: '16px', alignItems: 'center'}}>
-                                {(initInfo?.user_info?.Gmails && initInfo?.user_info?.Gmails.length > 0) ? initInfo?.user_info?.Gmails[0] :JSON.stringify(initInfo?.user_info?.Id, null, 2)}
+                                {(initInfo?.user_info?.Gmails && initInfo?.user_info?.Gmails.length > 0) ? initInfo?.user_info?.Gmails[0] : JSON.stringify(initInfo?.user_info?.Id, null, 2)}
                             </Typography>
                         </Flex>
                     </Dropdown>
                 </> :
-                <Button style={{color: "white"}} type="primary" href={mkServerUrl + "/auth/google/login"}>Google
-                    Login</Button>}
+                <Button onClick={() => {
+                    setLoggingIn(true);
+                }} style={{color: "white"}} type="primary"
+                        href={mkServerUrl + "/auth/google/login"}>{"Google Login"}</Button>}
         </Flex>
     </Header>
 }
