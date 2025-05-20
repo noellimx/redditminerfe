@@ -9,5 +9,9 @@
         }
       ]
     }
+  ],
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/" }
   ]
 }
+
