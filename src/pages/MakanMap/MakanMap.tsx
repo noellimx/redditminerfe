@@ -18,7 +18,8 @@ const iconPerson = new L.Icon({
 
 const mapContentStyle: React.CSSProperties = {
     textAlign: 'center',
-    minHeight: 120,
+    minHeight: "120px",
+    overflow: "auto",
     width: '100%',
     display: 'flex',
     height: '100%',
