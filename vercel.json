@@ -5,7 +5,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' https://golang-server-weathered-fog-6043.fly.dev; connect-src 'self' https://golang-server-weathered-fog-6043.fly.dev; img-src 'self' https://golang-server-weathered-fog-6043.fly.dev;"
+          "value": "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' https://golang-server-weathered-fog-6043.fly.dev; connect-src 'self' https://golang-server-weathered-fog-6043.fly.dev; img-src 'self' https://golang-server-weathered-fog-6043.fly.dev;"
         }
       ]
     }
