@@ -84,9 +84,6 @@ const MKHeader = ({initInfo}: MKHeaderProps) => {
 
     const [loggingIn, setLoggingIn] = useState<boolean>(false)
 
-    if (loggingIn) {
-        return  <Header style={headerStyle}><Typography>{"..."}</Typography></Header>
-    }
     return <Header style={headerStyle}>
         <Flex style={{justifyContent: 'end', width: '100%', alignItems: 'center', paddingRight: "10px", gap: "10px"}}>
             {isSessionActive ?
@@ -111,10 +108,10 @@ const MKHeader = ({initInfo}: MKHeaderProps) => {
                         </Flex>
                     </Dropdown>
                 </> :
-                <Button onClick={() => {
+                <Button disabled={loggingIn} onClick={() => {
                     setLoggingIn(true);
                 }} style={{color: "white"}} type="primary"
-                        href={mkServerUrl + "/auth/google/login"}>{"Google Login"}</Button>}
+                        href={mkServerUrl + "/auth/google/login"}>{loggingIn ? "Logging In..." : "Google Login"}</Button>}
         </Flex>
     </Header>
 }
