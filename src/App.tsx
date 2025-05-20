@@ -108,7 +108,7 @@ const MKHeader = ({initInfo}: MKHeaderProps) => {
                         </Flex>
                     </Dropdown>
                 </> :
-                <Button disabled={loggingIn} onClick={() => {
+                <Button onClick={() => {
                     setLoggingIn(true);
                 }} style={{color: "white"}} type="primary"
                         href={mkServerUrl + "/auth/google/login"}>{loggingIn ? "Logging In..." : "Google Login"}</Button>}
