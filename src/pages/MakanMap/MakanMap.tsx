@@ -63,7 +63,7 @@ export function MakanMap({initInfo}: Props) {
 
                 const {latitude, longitude} = latlong
                 console.log(latitude, longitude)
-                return <Marker icon={iconPerson} position={[parseFloat(latitude), parseFloat(longitude)]}>
+                return <Marker key={outlet.id} icon={iconPerson} position={[parseFloat(latitude), parseFloat(longitude)]}>
                     <Popup>
                         <Typography>
                             {`Outlet Name: ${name}`}

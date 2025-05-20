@@ -61,8 +61,9 @@ export const AddOutlet = async (mkServerUrl: string, body: FieldForms) => {
         body: JSON.stringify(body)
     });
     if (!response.ok) {
-        console.error(`Response status: ${response.status}`);
-        throw new Error(`Response status: ${response.status}`);
+        const data = await response.json() as { error: string };
+
+        throw new Error(`Response status: ${response.status}. Error: ${data.error}`);
     }
 
     return await response.json(); // todo: need await??
@@ -79,6 +80,7 @@ export interface Outlet {
     "official_links": string[]
     "review_links": string[]
     "latlong"?: LatLong
+    "id": number
 }
 
 export const GetOutlet = async (mkServerUrl: string) => {

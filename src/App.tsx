@@ -165,7 +165,9 @@ function App() {
     const logout = async () => {
         console.log("logout")
         try {
-            LogoutC(mkServerUrl)
+            await LogoutC(mkServerUrl)
+            localStorage.removeItem('session_id');
+            console.log(`logged out ${localStorage.getItem('session_id')}`)
             navigate("/")
         } catch (error) {
             const e = error as Error;
