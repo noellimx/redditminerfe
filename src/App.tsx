@@ -126,6 +126,29 @@ function Logout(props: { logout: () => Promise<void> }) {
 }
 
 
+function AuthCallbackComponent() {
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const sessionId = params.get('session_id');
+
+        if (sessionId) {
+            // Store it (usually in localStorage or sessionStorage)
+            localStorage.setItem('session_id', sessionId);
+
+            // Redirect to your main app
+            navigate('/');
+        } else {
+            // Handle error: no session ID found
+            navigate('/');
+        }
+    }, [location, navigate]);
+
+    return <></>;
+}
+
 function App() {
     const [initInfo, setInitInfo] = useState<Info | undefined>();
     const navigate = useNavigate();
@@ -170,6 +193,7 @@ function App() {
                         <Route path="store_form"
                                element={<OutletFormComponent initInfo={initInfo}>NEW FOOD STORE</OutletFormComponent>}/>
                     </Route>
+                    <Route path="auth_callback" element={<AuthCallbackComponent/>} />
                 </Route>
             </Routes>
             <Footer/>
