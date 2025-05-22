@@ -4,10 +4,11 @@ import {
     Form, type FormProps,
     Input, Modal,
     Select, Space, Typography,
-    Divider, Row,
+    Divider, Flex,
 } from 'antd';
 import {useEffect} from "react";
 import {useState} from "react";
+import Fuse from 'fuse.js';
 
 import {FileTextOutlined, MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
 import {FloatButton} from "antd";
@@ -41,6 +42,7 @@ export function OutletFormComponent({initInfo}: FormStoreProps) {
 
 
     const focusOutlet = (outletId: number) => {
+        console.log(`focusOutlet: ${outletId}`);
         if (outletId && initInfo) {
             GetOutlet(initInfo?.server_url, {"id": outletId.toString()}).then((outlets) => {
                 if (outlets.length > 0) {
@@ -56,10 +58,10 @@ export function OutletFormComponent({initInfo}: FormStoreProps) {
                     form.setFieldValue(["official_links"], officialLinks)
                     try {
                         const menu = outlet.menu.map(l => {
-                            return ({"value": l.name})
+                            return (l.name)
                         })
-                        form.setFieldValue(["menu"], menu)
-                    }catch (e) {
+                        form.setFieldsValue({"menu": menu})
+                    } catch (e) {
                         console.error(e)
                     }
 
@@ -67,7 +69,7 @@ export function OutletFormComponent({initInfo}: FormStoreProps) {
                     form.setFieldValue(["postal_code"], outlet.postal_code)
 
                     form.setFieldValue(["id"], outlet.id)
-                    form.setFieldValue(["outlet_name"], outlet.name)
+                    form.setFieldValue(["name"], outlet.name)
 
                     setAsExistingOutlet(true)
                 } else {
@@ -78,8 +80,24 @@ export function OutletFormComponent({initInfo}: FormStoreProps) {
         }
     }
 
-    // console.log(form.getFieldsValue());
+    console.log(form.getFieldsValue());
 
+
+    const [fusedSimilarOutlets, setFusedSimilarOutlets] = useState<Outlet[]>([]);
+
+    const updateFused = (outlets: Outlet[]) => {
+        const os = new Fuse(outlets, {
+            findAllMatches: true,
+            threshold: 1,
+            includeScore: true,
+            keys: ["name"]
+        }).search(form.getFieldValue("name") || "").map(({item}) => item)
+        if (os.length == 0) {
+            setFusedSimilarOutlets(outlets)
+        } else {
+            setFusedSimilarOutlets(os)
+        }
+    }
 
     if (!initInfo || initInfo?.user_info == undefined) {
         return <a> Please login to use this page.</a>;
@@ -92,13 +110,13 @@ export function OutletFormComponent({initInfo}: FormStoreProps) {
         try {
             if (forExistingOutlet) {
                 await UpdateOutlet(initInfo.server_url, {...form.getFieldsValue()});
-            }else {
-                await AddOutlet(initInfo.server_url, form.getFieldsValue());
+            } else {
+                const id = await AddOutlet(initInfo.server_url, form.getFieldsValue());
+                form.resetFields();
+                focusOutlet(id)
             }
 
-            form.resetFields();
 
-            setAsExistingOutlet(false);
             Modal.info({
                 title: '',
                 content: (
@@ -146,28 +164,37 @@ export function OutletFormComponent({initInfo}: FormStoreProps) {
                 style={{width: "90%", display: "flex", justifyContent: "center", flexDirection: "column"}}
                 onFinish={onFinish}
                 onFieldsChange={async (fields) => {
-                    if (forExistingOutlet) return;
-                    if (fields && fields[0]?.name[0] == "postal_code") {
-                        // get outlets if postal code valid
-                        if (fields[0].validated && fields[0].errors?.length == 0 && fields[0].value.length == 6) {
-                            try {
-                                const postalCode = fields[0]?.value;
-                                const similarOutlets = await GetOutlet(initInfo?.server_url, {"postal_code": postalCode})
-                                setSimilarOutlets(similarOutlets);
-                                return;
-                            } catch (e) {
-                                const ea = e as Error;
-                                console.error(ea.message);
+
+                    // similar outlets [begin]. only for new form
+                    if (!forExistingOutlet) {
+
+                        let _similarOutlets: Outlet[] = []
+                        if (fields && fields[0]?.name[0] == "postal_code") {
+                            // get outlets if postal code valid
+                            if (fields[0].validated && fields[0].errors?.length == 0 && fields[0].value.length == 6) {
+                                try {
+                                    const postalCode = fields[0]?.value;
+                                    _similarOutlets = await GetOutlet(initInfo?.server_url, {"postal_code": postalCode});
+                                } catch (e) {
+                                    const ea = e as Error;
+                                    console.error(ea.message);
+                                }
+
                             }
+                            setSimilarOutlets(_similarOutlets);
+                            updateFused(_similarOutlets);
                         }
 
-                        setSimilarOutlets([])
+                        if (fields && fields[0]?.name[0] == "name") {
+                            console.log(`before ${similarOutlets}`);
+                            updateFused(similarOutlets);
+                        }
                     }
                 }}
             >
                 {forExistingOutlet ? <Divider> Outlet {`${form.getFieldValue('id')}`}</Divider> :
                     <Divider>New Outlet</Divider>}
-                <Form.Item label="Outlet Name" name="outlet_name"
+                <Form.Item label="Outlet Name" name="name"
                            rules={[{required: true, message: "Please enter outlet name"}]}>
                     <Input/>
                 </Form.Item>
@@ -179,13 +206,7 @@ export function OutletFormComponent({initInfo}: FormStoreProps) {
                         <Select.Option value="Restaurant"> Restaurant </Select.Option>
                     </Select>
                 </Form.Item>
-                <Form.Item label="Menu" name="menu" rules={[{ required: false , type: 'array' }]}>
-                    <Select mode={"multiple"} >
-                        {outletForm && outletForm.product_names.map(item => {
-                            return <Select.Option value={item}> {item} </Select.Option>
-                        })}
-                    </Select>
-                </Form.Item>
+
                 <Divider>Location</Divider>
                 <Form.Item label="Address" name="address">
                     <Input/>
@@ -202,21 +223,34 @@ export function OutletFormComponent({initInfo}: FormStoreProps) {
                     <Input type="number"/>
                 </Form.Item>
 
-                {similarOutlets.length > 0 &&
+                {fusedSimilarOutlets.length > 0 &&
                     <>
-                        <Typography> There are similar entries. Click to Edit: </Typography>
-                        {
-                            similarOutlets.map(o => {
-                                    return <Row onClick={() => {
-                                        focusOutlet(o.id)
-                                        // console.log("setting similar outlets")
-                                        setSimilarOutlets([])
-                                    }} key={o.id}>{`${JSON.stringify(o.id) + JSON.stringify(o.name)}`}</Row>
-                                }
-                            )
-                        }
-                    </>
+                        <Typography> There are similar outlets. Click to edit existing outlet: </Typography>
+                        <Flex style={{gap: "10px", flexDirection: "row"}}>
+                            {
+                                fusedSimilarOutlets.map(o => {
+
+
+                                        return <Button type={"default"} style={{"width": "fit-content"}} onClick={() => {
+                                            focusOutlet(o.id)
+                                            setSimilarOutlets([])
+                                            setFusedSimilarOutlets([])
+                                        }} key={o.id}>{`${JSON.stringify(o.name)}`}</Button>
+                                    }
+                                )
+                            }
+                        </Flex></>
                 }
+                <Divider>Menu</Divider>
+
+                <Form.Item label="Menu" name="menu" rules={[{required: false, type: 'array'}]}>
+                    <Select mode={"multiple"}>
+                        {outletForm && outletForm.product_names.map(item => {
+                            return <Select.Option value={item}> {item} </Select.Option>
+                        })}
+                    </Select>
+                </Form.Item>
+
                 <Divider>Links</Divider>
 
                 <Card style={{backgroundColor: "white"}}>

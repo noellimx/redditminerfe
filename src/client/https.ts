@@ -86,8 +86,8 @@ export const AddOutlet = async (mkServerUrl: string, body: NewOutletFieldForm) =
 
         throw new Error(`Response status: ${response.status}. Error: ${data.error}`);
     }
-
-    return await response.json(); // todo: need await??
+    const resp : { data :{id : number}}= await response.json()
+    return resp.data.id ; // todo: need await??
 }
 
 export type LatLong = {
