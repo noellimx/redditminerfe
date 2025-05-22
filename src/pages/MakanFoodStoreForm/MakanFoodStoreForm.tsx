@@ -36,7 +36,7 @@ export function OutletFormComponent({initInfo}: FormStoreProps) {
         // }) || []
         // form.setFieldValue(["menu"], nnp)
 
-        console.log(form.getFieldsValue());
+        // console.log(form.getFieldsValue());
     }, [form, initInfo])
 
 
@@ -78,7 +78,7 @@ export function OutletFormComponent({initInfo}: FormStoreProps) {
         }
     }
 
-    console.log(form.getFieldsValue());
+    // console.log(form.getFieldsValue());
 
 
     if (!initInfo || initInfo?.user_info == undefined) {
@@ -209,7 +209,7 @@ export function OutletFormComponent({initInfo}: FormStoreProps) {
                             similarOutlets.map(o => {
                                     return <Row onClick={() => {
                                         focusOutlet(o.id)
-                                        console.log("setting similar outlets")
+                                        // console.log("setting similar outlets")
                                         setSimilarOutlets([])
                                     }} key={o.id}>{`${JSON.stringify(o.id) + JSON.stringify(o.name)}`}</Row>
                                 }
@@ -279,7 +279,7 @@ export function OutletFormComponent({initInfo}: FormStoreProps) {
                                         {/*    </Select>*/}
                                         {/*</Form.Item>*/}
                                         <MinusCircleOutlined onClick={() => {
-                                            console.log(`removing ${name}`)
+                                            // console.log(`removing ${name}`)
                                             remove(name)
                                         }}/>
                                     </Space.Compact>

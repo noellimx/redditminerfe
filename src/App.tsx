@@ -57,7 +57,7 @@ interface MKHeaderProps {
 // const mkServerUrl = "http://localhost:8080"
 const mkServerUrl = import.meta.env.VITE_SERVER_URL
 
-console.log(`mkServerUrl ${mkServerUrl}`)
+// console.log(`mkServerUrl ${mkServerUrl}`)
 
 
 const items: MenuProps['items'] = [
@@ -150,6 +150,7 @@ function AuthCallbackComponent() {
 }
 
 function App() {
+
     const [initInfo, setInitInfo] = useState<Info | undefined>();
     const navigate = useNavigate();
     const location = useLocation();
@@ -157,17 +158,21 @@ function App() {
     useEffect(() => {
         (async () => {
             // setInitInfo(await Ping(mkServerUrl))
-            console.log("setting info")
+            // console.log("setting info")
             setInitInfo(await Ping(mkServerUrl))
         })();
     }, [location.pathname])
 
+    if (import.meta.env.VITE_SERVER_URL) {
+        return <>{'Error Code S-0001. Please contact admin.'}</>
+    }
+
     const logout = async () => {
-        console.log("logout")
+        // console.log("logout")
         try {
             await LogoutC(mkServerUrl)
             localStorage.removeItem('session_id');
-            console.log(`logged out ${localStorage.getItem('session_id')}`)
+            // console.log(`logged out ${localStorage.getItem('session_id')}`)
             navigate("/")
         } catch (error) {
             const e = error as Error;
@@ -195,7 +200,7 @@ function App() {
                         <Route path="store_form"
                                element={<OutletFormComponent initInfo={initInfo}>NEW FOOD STORE</OutletFormComponent>}/>
                     </Route>
-                    <Route path="auth_callback" element={<AuthCallbackComponent/>} />
+                    <Route path="auth_callback" element={<AuthCallbackComponent/>}/>
                 </Route>
             </Routes>
             <Footer/>

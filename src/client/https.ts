@@ -120,7 +120,7 @@ export const GetOutlet = async (mkServerUrl: string, params: GetOutletQuery) => 
     const url = mkServerUrl + "/outlets";
     const Url = new URL(url);
     if (params)  Object.keys(params).forEach(key => Url.searchParams.append(key, params[key]));
-    console.log(Url.toString());
+    // console.log(Url.toString());
     const response = await fetch(Url, {
         method: "GET", credentials: 'include', headers: {...AuthHeader(),},
     });
