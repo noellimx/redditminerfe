@@ -4,24 +4,30 @@ import {
     Form, type FormProps,
     Input, Modal,
     Select, Space, Typography,
-    Divider,
+    Divider, Row,
 } from 'antd';
 import {useEffect} from "react";
+import {useState} from "react";
+
 import {FileTextOutlined, MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
 import {FloatButton} from "antd";
-import {AddOutlet, type FieldForms} from "../../client/https.ts";
+import {AddOutlet, type NewOutletFieldForm, GetOutlet, type Outlet, UpdateOutlet} from "../../client/https.ts";
 
 type FormStoreProps = {
     initInfo?: Info
     children: React.ReactNode
+    outletId?: number
 }
 
 
 export function OutletFormComponent({initInfo}: FormStoreProps) {
     const [form] = Form.useForm();
+    const [similarOutlets, setSimilarOutlets] = useState<Outlet[]>([]);
+
+
+    const [forExistingOutlet, setAsExistingOutlet] = useState(!!form.getFieldValue("id"));
 
     const outletForm = initInfo?.outlet_form;
-
     useEffect(() => {
         // const outletForm = initInfo?.outlet_form;
 
@@ -34,40 +40,82 @@ export function OutletFormComponent({initInfo}: FormStoreProps) {
     }, [form, initInfo])
 
 
+    const focusOutlet = (outletId: number) => {
+        if (outletId && initInfo) {
+            GetOutlet(initInfo?.server_url, {"id": outletId.toString()}).then((outlets) => {
+                if (outlets.length > 0) {
+                    const outlet = outlets[0]
+
+                    const reviewLinks = outlet.review_links.map(l => {
+                        return ({"value": l})
+                    })
+                    form.setFieldValue(["review_links"], reviewLinks)
+                    const officialLinks = outlet.official_links.map(l => {
+                        return ({"value": l})
+                    })
+                    form.setFieldValue(["official_links"], officialLinks)
+                    try {
+                        const menu = outlet.menu.map(l => {
+                            return ({"value": l.name})
+                        })
+                        form.setFieldValue(["menu"], menu)
+                    }catch (e) {
+                        console.error(e)
+                    }
+
+                    form.setFieldValue(["address"], outlet.address)
+                    form.setFieldValue(["postal_code"], outlet.postal_code)
+
+                    form.setFieldValue(["id"], outlet.id)
+                    form.setFieldValue(["outlet_name"], outlet.name)
+
+                    setAsExistingOutlet(true)
+                } else {
+
+                    throw new Error("very weird, cannot find outlet")
+                }
+            })
+        }
+    }
+
+    console.log(form.getFieldsValue());
+
+
     if (!initInfo || initInfo?.user_info == undefined) {
         return <a> Please login to use this page.</a>;
     }
 
-
-    const onFinish: FormProps<FieldForms>['onFinish'] = async (values) => {
-        console.log(`valueessss ${JSON.stringify(values)}`);
+    const onFinish: FormProps<NewOutletFieldForm>['onFinish'] = async (values) => {
+        console.log(`forExistingOutlet ${forExistingOutlet} valueessss ${JSON.stringify(values)}`);
         console.log(form.getFieldsValue());
 
-
         try {
-            await AddOutlet(initInfo.server_url, form.getFieldsValue());
+            if (forExistingOutlet) {
+                await UpdateOutlet(initInfo.server_url, {...form.getFieldsValue()});
+            }else {
+                await AddOutlet(initInfo.server_url, form.getFieldsValue());
+            }
 
             form.resetFields();
 
-
+            setAsExistingOutlet(false);
             Modal.info({
                 title: '',
                 content: (
                     <div>
-                        Success!
+                        {forExistingOutlet ? "Edit Success" : "Create Success"}
                     </div>
                 ),
                 onOk() {
                 },
             })
-
         } catch (e) {
-
             const ea = e as Error;
             Modal.error({
                 title: '',
                 content: (
                     <div>
+                        {forExistingOutlet ? "Edit Error" : "Create Error "}
                         {ea.message}
                     </div>
                 ),
@@ -75,9 +123,7 @@ export function OutletFormComponent({initInfo}: FormStoreProps) {
                 },
             })
         }
-
         return;
-
     }
 
     return (
@@ -99,13 +145,33 @@ export function OutletFormComponent({initInfo}: FormStoreProps) {
                 size={"small"}
                 style={{width: "90%", display: "flex", justifyContent: "center", flexDirection: "column"}}
                 onFinish={onFinish}
+                onFieldsChange={async (fields) => {
+                    if (forExistingOutlet) return;
+                    if (fields && fields[0]?.name[0] == "postal_code") {
+                        // get outlets if postal code valid
+                        if (fields[0].validated && fields[0].errors?.length == 0 && fields[0].value.length == 6) {
+                            try {
+                                const postalCode = fields[0]?.value;
+                                const similarOutlets = await GetOutlet(initInfo?.server_url, {"postal_code": postalCode})
+                                setSimilarOutlets(similarOutlets);
+                                return;
+                            } catch (e) {
+                                const ea = e as Error;
+                                console.error(ea.message);
+                            }
+                        }
+
+                        setSimilarOutlets([])
+                    }
+                }}
             >
-                <Divider>Outlet</Divider>
+                {forExistingOutlet ? <Divider> Outlet {`${form.getFieldValue('id')}`}</Divider> :
+                    <Divider>New Outlet</Divider>}
                 <Form.Item label="Outlet Name" name="outlet_name"
                            rules={[{required: true, message: "Please enter outlet name"}]}>
                     <Input/>
                 </Form.Item>
-                <Form.Item label="Outlet Type" name="outlet_type">
+                <Form.Item hidden label="Outlet Type" name="outlet_type">
                     <Select>
                         <Select.Option value="Hawker Center"> Hawker Center </Select.Option>
                         <Select.Option value="Kopitiam"> Kopitiam </Select.Option>
@@ -124,18 +190,33 @@ export function OutletFormComponent({initInfo}: FormStoreProps) {
                 <Form.Item label="Address" name="address">
                     <Input/>
                 </Form.Item>
-                <Form.Item label="Postal Code" name={"postal_code"} rules={[{
-                    validator: (_, value) => {
-                        if (value.length !== 6) {
-                            return Promise.reject(new Error(`Invalid postal code`));
-                        }
-                        return Promise.resolve();
-                    }, message: "Invalid 6-digit Postal Code"
-                }]}>
+                <Form.Item label="Postal Code" name={"postal_code"}
+                           rules={[{
+                               validator: (_, value) => {
+                                   if (value.length !== 6) {
+                                       return Promise.reject(new Error(`Invalid postal code`));
+                                   }
+                                   return Promise.resolve();
+                               }, message: "Invalid 6-digit Postal Code"
+                           }]}>
                     <Input type="number"/>
                 </Form.Item>
 
-
+                {similarOutlets.length > 0 &&
+                    <>
+                        <Typography> There are similar entries. Click to Edit: </Typography>
+                        {
+                            similarOutlets.map(o => {
+                                    return <Row onClick={() => {
+                                        focusOutlet(o.id)
+                                        console.log("setting similar outlets")
+                                        setSimilarOutlets([])
+                                    }} key={o.id}>{`${JSON.stringify(o.id) + JSON.stringify(o.name)}`}</Row>
+                                }
+                            )
+                        }
+                    </>
+                }
                 <Divider>Links</Divider>
 
                 <Card style={{backgroundColor: "white"}}>
@@ -225,9 +306,11 @@ export function OutletFormComponent({initInfo}: FormStoreProps) {
                             border: "1px solid red"
                         }}
                     >
-                        Submit aa
+                        Submit
                     </FloatButton>
                 </Form.Item>
+
+                <Form.Item hidden={true} name={"id"}/>
             </Form>
         </div>
     );

@@ -49,9 +49,30 @@ const FormSchema = z.object({
     "official_links": z.array(OfficialLinkSchema),
 });
 
-export type FieldForms = z.infer<typeof FormSchema>;
+export type NewOutletFieldForm = z.infer<typeof FormSchema>;
+export type ExistingOutletFieldForm = z.infer<typeof FormSchema> & {id:number};
 
-export const AddOutlet = async (mkServerUrl: string, body: FieldForms) => {
+
+
+export const UpdateOutlet = async (mkServerUrl: string, body: ExistingOutletFieldForm) => {
+    // body["product_name"] = "";
+    const url = mkServerUrl + "/outlet/";
+    const response = await fetch(url, {
+        method: "PUT", credentials: 'include', headers: {
+            'Content-Type': 'application/json', ...AuthHeader(),
+        },
+        body: JSON.stringify(body)
+    });
+    if (!response.ok) {
+        const data = await response.json() as { error: string };
+
+        throw new Error(`Response status: ${response.status}. Error: ${data.error}`);
+    }
+
+    return await response.json(); // todo: need await??
+}
+
+export const AddOutlet = async (mkServerUrl: string, body: NewOutletFieldForm) => {
     // body["product_name"] = "";
     const url = mkServerUrl + "/outlet/";
     const response = await fetch(url, {
@@ -73,20 +94,34 @@ export type LatLong = {
     latitude: string
     longitude: string
 }
+
+interface MenuItem {
+    id: number;
+    name: string;
+}
+
 export interface Outlet {
+    menu: MenuItem[];
+    "id": number
     "name": string
     "address": string
     "postal_code": string
     "official_links": string[]
     "review_links": string[]
     "latlong"?: LatLong
-    "id": number
 }
 
-export const GetOutlet = async (mkServerUrl: string) => {
+interface GetOutletQuery {
+    [key: string]: string
+}
+
+export const GetOutlet = async (mkServerUrl: string, params: GetOutletQuery) => {
     // body["product_name"] = "";
-    const url = mkServerUrl + "/outlets/";
-    const response = await fetch(url, {
+    const url = mkServerUrl + "/outlets";
+    const Url = new URL(url);
+    if (params)  Object.keys(params).forEach(key => Url.searchParams.append(key, params[key]));
+    console.log(Url.toString());
+    const response = await fetch(Url, {
         method: "GET", credentials: 'include', headers: {...AuthHeader(),},
     });
     if (!response.ok) {
@@ -100,6 +135,18 @@ export const GetOutlet = async (mkServerUrl: string) => {
         }
     };
 
+    return resp.data.outlets?.map((outlet: Outlet) => {
+        return {
+            id: outlet.id,
+            name: outlet.name,
+            address: outlet.address,
+            postal_code: outlet.postal_code,
+            official_links: outlet.official_links || [],
+            review_links: outlet.review_links || [],
+            latlong: outlet.latlong,
 
-    return resp.data.outlets;
+            menu: outlet.menu,
+        };
+    }) || [];
+
 }

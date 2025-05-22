@@ -34,7 +34,7 @@ export function MakanMap({initInfo}: Props) {
     const [outlets, setOutlets] = useState<Outlet[]>([]);
     useEffect(() => {
         (async () => {
-            const outlets = await GetOutlet(initInfo ? initInfo.server_url : "")
+            const outlets = await GetOutlet(initInfo ? initInfo.server_url : "", {})
             console.log(`outlets ${JSON.stringify(outlets)}`);
             setOutlets(outlets || []);
         })();
