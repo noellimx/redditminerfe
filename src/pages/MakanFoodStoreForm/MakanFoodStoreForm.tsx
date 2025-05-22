@@ -20,11 +20,18 @@ type FormStoreProps = {
 export function OutletFormComponent({initInfo}: FormStoreProps) {
     const [form] = Form.useForm();
 
-
     const outletForm = initInfo?.outlet_form;
+
     useEffect(() => {
-        // form.setFieldValue("address","rdda")
-    }, [form])
+        // const outletForm = initInfo?.outlet_form;
+
+        // const nnp = outletForm?.product_names.map(item => {
+        //     return {"value" : item};
+        // }) || []
+        // form.setFieldValue(["menu"], nnp)
+
+        console.log(form.getFieldsValue());
+    }, [form, initInfo])
 
 
     if (!initInfo || initInfo?.user_info == undefined) {
@@ -106,10 +113,8 @@ export function OutletFormComponent({initInfo}: FormStoreProps) {
                         <Select.Option value="Restaurant"> Restaurant </Select.Option>
                     </Select>
                 </Form.Item>
-                <Form.Item label="Product" name="product_name" rules={[{
-                    required: true,
-                }]}>
-                    <Select>
+                <Form.Item label="Menu" name="menu" rules={[{ required: false , type: 'array' }]}>
+                    <Select mode={"multiple"} >
                         {outletForm && outletForm.product_names.map(item => {
                             return <Select.Option value={item}> {item} </Select.Option>
                         })}
