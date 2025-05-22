@@ -163,7 +163,7 @@ function App() {
         })();
     }, [location.pathname])
 
-    if (import.meta.env.VITE_SERVER_URL) {
+    if (!import.meta.env.VITE_SERVER_URL) {
         return <>{'Error Code S-0001. Please contact admin.'}</>
     }
 
