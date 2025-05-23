@@ -107,7 +107,11 @@ export interface Outlet {
     "address": string
     "postal_code": string
     "official_links": string[]
-    "review_links": string[]
+    "review_links": {
+       "link" : string
+       "platform" : string
+       "creator" : string
+    }[]
     "latlong"?: LatLong
 }
 

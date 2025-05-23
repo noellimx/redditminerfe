@@ -29,6 +29,7 @@ export function OutletFormComponent({initInfo}: FormStoreProps) {
     const [forExistingOutlet, setAsExistingOutlet] = useState(!!form.getFieldValue("id"));
 
     const outletForm = initInfo?.outlet_form;
+    console.log(outletForm);
     useEffect(() => {
         // const outletForm = initInfo?.outlet_form;
 
@@ -49,11 +50,11 @@ export function OutletFormComponent({initInfo}: FormStoreProps) {
                     const outlet = outlets[0]
 
                     const reviewLinks = outlet.review_links.map(l => {
-                        return ({"value": l})
+                        return ({"link": l.link, "platform" : l.platform, "creator" : l.creator })
                     })
                     form.setFieldValue(["review_links"], reviewLinks)
                     const officialLinks = outlet.official_links.map(l => {
-                        return ({"value": l})
+                        return ({"link": l})
                     })
                     form.setFieldValue(["official_links"], officialLinks)
                     try {
@@ -192,7 +193,7 @@ export function OutletFormComponent({initInfo}: FormStoreProps) {
                     }
                 }}
             >
-                {forExistingOutlet ? <Divider> Outlet {`${form.getFieldValue('id')}`}</Divider> :
+                {forExistingOutlet ? <Divider style={{textAlign:"left"}}> Editing Outlet {`${form.getFieldValue('id')}`}</Divider> :
                     <Divider>New Outlet</Divider>}
                 <Form.Item label="Outlet Name" name="name"
                            rules={[{required: true, message: "Please enter outlet name"}]}>
@@ -229,13 +230,11 @@ export function OutletFormComponent({initInfo}: FormStoreProps) {
                         <Flex style={{gap: "10px", flexDirection: "row"}}>
                             {
                                 fusedSimilarOutlets.map(o => {
-
-
                                         return <Button type={"default"} style={{"width": "fit-content"}} onClick={() => {
                                             focusOutlet(o.id)
                                             setSimilarOutlets([])
                                             setFusedSimilarOutlets([])
-                                        }} key={o.id}>{`${JSON.stringify(o.name)}`}</Button>
+                                        }} key={o.id}>{o.name}</Button>
                                     }
                                 )
                             }
@@ -263,7 +262,7 @@ export function OutletFormComponent({initInfo}: FormStoreProps) {
                                                    style={{gap: "10px", display: 'flex'}}>
                                         <Form.Item
                                             {...restField}
-                                            name={[name, 'value']}
+                                            name={[name, 'link']}
                                             rules={[{required: true, message: "please fill or remove empty link"}]}
                                             style={{flex: 1}}
                                         >
@@ -292,11 +291,37 @@ export function OutletFormComponent({initInfo}: FormStoreProps) {
                                         <Form.Item
                                             {...restField}
                                             className={"form_item_review_links_textarea"}
-                                            name={[name, 'value']}
+                                            name={[name, 'link']}
                                             rules={[{required: true, message: "please fill or remove empty link"}]}
                                             style={{flex: 1}}
                                         >
-                                            <Input.TextArea placeholder=""/>
+                                            <Input.TextArea placeholder="Link"/>
+                                        </Form.Item>
+                                        <Form.Item
+                                            {...restField}
+                                            className={"form_item_review_links_textarea"}
+                                            name={[name, 'creator']}
+                                            rules={[{required: true, message: "please fill or remove empty creator"}]}
+                                            style={{flex: 1}}
+                                        >
+                                            <Select >
+                                                {outletForm && outletForm?.platforms?.map(item => {
+                                                    return <Select.Option value={item}> {item} </Select.Option>
+                                                })}
+                                            </Select>
+                                        </Form.Item>
+                                        <Form.Item
+                                            {...restField}
+                                            className={"form_item_review_links_textarea"}
+                                            name={[name, 'platform']}
+                                            rules={[{required: true, message: "please fill or remove empty platform"}]}
+                                            style={{flex: 1}}
+                                        >
+                                            <Select>
+                                                {outletForm && outletForm?.creators?.map(item => {
+                                                    return <Select.Option value={item}> {item} </Select.Option>
+                                                })}
+                                            </Select>
                                         </Form.Item>
 
                                         {/*<Form.Item*/}

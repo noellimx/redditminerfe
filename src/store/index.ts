@@ -1,6 +1,7 @@
 interface StallFormInfo {
+    platforms: string[];
+    creators: string[];
     "product_names" : string[]
-    "sources": string[]
 }
 
 // const sampleInfo: Info = {"login_urls": {"google": "/auth/google/login"}, "user_info": {"Id": 0}};
