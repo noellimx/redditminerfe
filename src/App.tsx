@@ -3,7 +3,7 @@ import '@ant-design/v5-patch-for-react-19';
 import "leaflet/dist/leaflet.css";
 
 
-import {ConfigProvider, type MenuProps} from 'antd';
+import { type MenuProps} from 'antd';
 import {Button, Dropdown, Flex, Layout, Typography} from 'antd';
 import React, {useEffect, useRef, useState,} from "react";
 import {UserOutlined} from "@ant-design/icons";
@@ -14,7 +14,6 @@ import {MakanMap} from "./pages/MakanMap/MakanMap.tsx";
 import type {Info} from "./store";
 import {OutletFormComponent} from "./pages/MakanFoodStoreForm/MakanFoodStoreForm.tsx";
 import {LogoutC, Ping} from "./client/https.ts";
-import {Colors} from "./colors";
 
 const {Header, Content} = Layout;
 
@@ -54,14 +53,15 @@ const mkServerUrl = import.meta.env.VITE_SERVER_URL
 
 
 const items: MenuProps['items'] = [
+    // {
+    //     key: '/user',
+    //     label: 'Profile',
+    // },
+    // {
+    //     key: '/user/settings',
+    //     label: 'Settings',
+    // },
     {
-        key: '/user',
-        label: 'Profile',
-    },
-    {
-        key: '/user/settings',
-        label: 'Settings',
-    }, {
         key: '/logout',
         label: 'Logout',
     },
@@ -103,7 +103,7 @@ const MKHeader = ({initInfo, ref}: MKHeaderProps) => {
                 </> :
                 <Button onClick={() => {
                     setLoggingIn(true);
-                }} style={{color: "white"}} type="primary"
+                }} style={{}} type="primary"
                         href={mkServerUrl + "/auth/google/login"}>{loggingIn ? "Logging In..." : "Google Login"}</Button>}
         </Flex>
     </Header>
@@ -196,14 +196,7 @@ function App() {
 
     console.log(`VITE_SERVER_URL=${import.meta.env.VITE_SERVER_URL}`);
     return (
-        <ConfigProvider theme={{
-            token: {
-                // Seed Token
-                colorText: Colors.CHARBLACK,
-                // Alias Token
-                // colorBgContainer: '#f6ffed',
-            },
-        }}>
+
             <Layout style={layoutStyle}>
                 <MKHeader ref={headerRef} initInfo={initInfo} logout={logout}></MKHeader>
                 <Routes>
@@ -227,7 +220,7 @@ function App() {
                     </Route>
                 </Routes>
                 <Footer ref={footerRef}/>
-            </Layout></ConfigProvider>
+            </Layout>
     )
 }
 

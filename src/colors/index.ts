@@ -17,4 +17,6 @@ export const Colors = {
 
 
     CHARBLACK: "#1E1E1E",
+    DEEPBROWN: "#3B1F1F",
+    GREY: "#333333"
 }

@@ -9,7 +9,7 @@ import {
 import {useState} from "react";
 import Fuse from 'fuse.js';
 
-import {FileTextOutlined, MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
+import {CloseSquareFilled, FileTextOutlined, MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
 import {FloatButton} from "antd";
 import {AddOutlet, type NewOutletFieldForm, GetOutlet, type Outlet, UpdateOutlet} from "../../client/https.ts";
 import {Colors} from "../../colors";
@@ -213,14 +213,14 @@ export function OutletFormComponent({initInfo}: FormStoreProps) {
 
                 {fusedSimilarOutlets.length > 0 &&
                     <Card style={{borderRadius: "15px", position: "relative"}}>
-                        <div style={{position: "absolute", top: 0, right: 0}}>asasd</div>
+                        <Button icon={<CloseSquareFilled style={{color: Colors.RED_5, fontSize: "20px"}}/>}  style={{border: 0, position: "absolute", top: 0, right: 0}}></Button>
                         <Typography style={{fontWeight: "bold", textAlign: "start"}}> There are similar outlets.
                             Click to edit existing outlet: </Typography>
                         <Flex style={{gap: "10px", flexDirection: "row"}}>
                             {
                                 fusedSimilarOutlets.map(o => {
-                                        return <Button type={"default"}
-                                                       style={{backgroundColor: Colors.RED_3, "width": "fit-content"}}
+                                        return <Button type={"primary"}
+                                                       style={{ "width": "fit-content"}}
                                                        onClick={() => {
                                                            focusOutlet(o.id)
                                                            setSimilarOutlets([])
@@ -295,7 +295,7 @@ export function OutletFormComponent({initInfo}: FormStoreProps) {
                                             rules={[{required: true, message: "please fill or remove empty creator"}]}
                                             style={{flex: 1}}
                                         >
-                                            <Select>
+                                            <Select placeholder={"Plaform"}>
                                                 {outletForm && outletForm?.platforms?.map(item => {
                                                     return <Select.Option value={item}> {item} </Select.Option>
                                                 })}
@@ -308,7 +308,7 @@ export function OutletFormComponent({initInfo}: FormStoreProps) {
                                             rules={[{required: true, message: "please fill or remove empty platform"}]}
                                             style={{flex: 1}}
                                         >
-                                            <Select>
+                                            <Select placeholder={"Creator"}>
                                                 {outletForm && outletForm?.creators?.map(item => {
                                                     return <Select.Option value={item}> {item} </Select.Option>
                                                 })}
