@@ -3,7 +3,7 @@ import '@ant-design/v5-patch-for-react-19';
 import "leaflet/dist/leaflet.css";
 
 
-import type {MenuProps} from 'antd';
+import {ConfigProvider, type MenuProps} from 'antd';
 import {Button, Dropdown, Flex, Layout, Typography} from 'antd';
 import React, {useEffect, useState,} from "react";
 import {UserOutlined} from "@ant-design/icons";
@@ -14,6 +14,7 @@ import {MakanMap} from "./pages/MakanMap/MakanMap.tsx";
 import type {Info} from "./store";
 import {OutletFormComponent} from "./pages/MakanFoodStoreForm/MakanFoodStoreForm.tsx";
 import {LogoutC, Ping} from "./client/https.ts";
+import {Colors} from "./colors";
 
 const {Header, Content} = Layout;
 
@@ -182,6 +183,14 @@ function App() {
 
     console.log(`VITE_SERVER_URL=${import.meta.env.VITE_SERVER_URL}`);
     return (
+        <ConfigProvider     theme={{
+            token: {
+                // Seed Token
+                colorText: Colors.CHARBLACK,
+                // Alias Token
+                // colorBgContainer: '#f6ffed',
+            },
+        }}>
         <Layout style={layoutStyle}>
             <MKHeader initInfo={initInfo} logout={logout}></MKHeader>
             <Routes>
@@ -204,7 +213,7 @@ function App() {
                 </Route>
             </Routes>
             <Footer/>
-        </Layout>
+        </Layout></ConfigProvider>
     )
 }
 

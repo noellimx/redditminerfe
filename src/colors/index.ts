@@ -14,4 +14,7 @@ export const Colors = {
     RED_8 : "#a8071a",
     RED_9 : "#820014",
     RED_10 : "#5c0011",
+
+
+    CHARBLACK: "#1E1E1E",
 }

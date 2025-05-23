@@ -149,7 +149,7 @@ export function OutletFormComponent({initInfo}: FormStoreProps) {
         <div className="mkmakanstore" style={{
             display: 'flex',
             flexDirection: 'column',
-            justifyContent: "center",
+            justifyContent: "start",
             width: "100%",
             height: "fit-content",
             minHeight: "100%",
