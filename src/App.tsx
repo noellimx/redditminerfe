@@ -5,7 +5,7 @@ import "leaflet/dist/leaflet.css";
 
 import {ConfigProvider, type MenuProps} from 'antd';
 import {Button, Dropdown, Flex, Layout, Typography} from 'antd';
-import React, {useEffect, useState,} from "react";
+import React, {useEffect, useRef, useState,} from "react";
 import {UserOutlined} from "@ant-design/icons";
 import {Outlet, Route, Routes, useLocation, useNavigate} from "react-router";
 import {Footer} from "./layouts/Footer/Footer.tsx";
@@ -28,30 +28,22 @@ const layoutStyle = {
 
 interface MKContentProps {
     initInfo?: Info
+    height: number
 }
 
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const MKContent = (_: MKContentProps) => {
-    return <Content style={contentStyle}>
+const MKContent = ({height}: MKContentProps) => {
+    return <Content style={contentStyle(height)}>
         <Outlet/>
     </Content>
 }
 
-interface MKContent_UserProps {
-    initInfo?: Info
-}
-
-const MKContent_User: React.FC<MKContent_UserProps> = () => {
-    return <Content style={contentStyle}>
-        <Outlet/>
-    </Content>
-}
 
 
 interface MKHeaderProps {
-    initInfo?: Info
-    logout: () => void
+    initInfo?: Info,
+    logout: () => void,
+    ref?: React.RefObject<HTMLDivElement | null>
 }
 
 
@@ -76,7 +68,7 @@ const items: MenuProps['items'] = [
 ];
 
 
-const MKHeader = ({initInfo}: MKHeaderProps) => {
+const MKHeader = ({initInfo, ref}: MKHeaderProps) => {
     const user_info = initInfo?.user_info;
 
     const isSessionActive = !(user_info == undefined || initInfo == null);
@@ -85,7 +77,7 @@ const MKHeader = ({initInfo}: MKHeaderProps) => {
 
     const [loggingIn, setLoggingIn] = useState<boolean>(false)
 
-    return <Header style={headerStyle}>
+    return <Header ref={ref} style={headerStyle}>
         <Flex style={{justifyContent: 'end', width: '100%', alignItems: 'center', paddingRight: "10px", gap: "10px"}}>
             {isSessionActive ?
                 <>
@@ -156,6 +148,27 @@ function App() {
     const navigate = useNavigate();
     const location = useLocation();
 
+
+    const headerRef = useRef<HTMLDivElement | null>(null);
+    const footerRef = useRef<HTMLDivElement>(null);
+    const [contentHeight, setContentHeight] = useState(0);
+
+    useEffect(() => {
+        const calculateContentHeight = () => {
+            const headerHeight = headerRef.current?.offsetHeight || 0;
+            const footerHeight = footerRef.current?.offsetHeight || 0;
+            const totalHeight = window.innerHeight;
+            setContentHeight(totalHeight - headerHeight - footerHeight);
+        };
+
+        calculateContentHeight();
+
+        // Recalculate on window resize
+        window.addEventListener('resize', calculateContentHeight);
+        return () => window.removeEventListener('resize', calculateContentHeight);
+    }, []);
+
+
     useEffect(() => {
         (async () => {
             // setInitInfo(await Ping(mkServerUrl))
@@ -183,7 +196,7 @@ function App() {
 
     console.log(`VITE_SERVER_URL=${import.meta.env.VITE_SERVER_URL}`);
     return (
-        <ConfigProvider     theme={{
+        <ConfigProvider theme={{
             token: {
                 // Seed Token
                 colorText: Colors.CHARBLACK,
@@ -191,29 +204,30 @@ function App() {
                 // colorBgContainer: '#f6ffed',
             },
         }}>
-        <Layout style={layoutStyle}>
-            <MKHeader initInfo={initInfo} logout={logout}></MKHeader>
-            <Routes>
-                <Route path="*" element={<MKContent initInfo={initInfo}></MKContent>}>
-                    <Route index element={<Typography>INDEX</Typography>}/>
-                    <Route path="settings" element={<Typography>SETTINGS</Typography>}/>
-                    <Route path="user" element={<MKContent_User initInfo={initInfo}></MKContent_User>}>
-                        <Route index element={<Typography>USERPROFILE (INDEX)</Typography>}/>
-                        <Route path="profile" element={<Typography>USERPROFILE</Typography>}/>
-                        <Route path="settings" element={<Typography>USERSETTINGS</Typography>}/>
+            <Layout style={layoutStyle}>
+                <MKHeader ref={headerRef} initInfo={initInfo} logout={logout}></MKHeader>
+                <Routes>
+                    <Route path="*" element={<MKContent height={contentHeight} initInfo={initInfo}></MKContent>}>
+                        <Route index element={<Typography>INDEX</Typography>}/>
+                        <Route path="settings" element={<Typography>SETTINGS</Typography>}/>
+                        <Route path="user" element={<Outlet />}>
+                            <Route index element={<Typography>USERPROFILE (INDEX)</Typography>}/>
+                            <Route path="profile" element={<Typography>USERPROFILE</Typography>}/>
+                            <Route path="settings" element={<Typography>USERSETTINGS</Typography>}/>
+                        </Route>
+                        <Route path="logout" element={<Logout logout={logout}/>}/>
+                        <Route path="map" element={<MakanMap initInfo={initInfo}></MakanMap>}/>
+                        <Route path="edit" element={<Outlet/>}>
+                            <Route path="menu" element={<><a>EDIT MENU </a></>}/>
+                            <Route path="store_form"
+                                   element={<OutletFormComponent initInfo={initInfo}>NEW FOOD
+                                       STORE</OutletFormComponent>}/>
+                        </Route>
+                        <Route path="auth_callback" element={<AuthCallbackComponent/>}/>
                     </Route>
-                    <Route path="logout" element={<Logout logout={logout}/>}/>
-                    <Route path="map" element={<MakanMap initInfo={initInfo}></MakanMap>}/>
-                    <Route path="edit" element={<Outlet/>}>
-                        <Route path="menu" element={<><a>EDIT MENU </a></>}/>
-                        <Route path="store_form"
-                               element={<OutletFormComponent initInfo={initInfo}>NEW FOOD STORE</OutletFormComponent>}/>
-                    </Route>
-                    <Route path="auth_callback" element={<AuthCallbackComponent/>}/>
-                </Route>
-            </Routes>
-            <Footer/>
-        </Layout></ConfigProvider>
+                </Routes>
+                <Footer ref={footerRef}/>
+            </Layout></ConfigProvider>
     )
 }
 

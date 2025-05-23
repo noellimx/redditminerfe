@@ -2,7 +2,7 @@ import React from "react";
 import {Colors} from "../../colors";
 import {Footer as AntdFooter} from "antd/es/layout/layout";
 import {Flex} from "antd";
-import {GlobalOutlined,  PlusOutlined} from "@ant-design/icons";
+import {GlobalOutlined, PlusOutlined} from "@ant-design/icons";
 import {useNavigate} from "react-router";
 
 
@@ -15,13 +15,18 @@ const footerStyle: React.CSSProperties = {
 };
 
 
-export const Footer = () => {
-    const navigate = useNavigate()
-    const to = (path:string) => () => navigate(path)
+interface FooterProps {
+    ref?: React.RefObject<HTMLDivElement | null>
+}
 
-    return <AntdFooter style={footerStyle}><Flex style={{flexDirection: "row", justifyContent: "space-around"}}>
+export const Footer = ({ref}: FooterProps) => {
+    const navigate = useNavigate()
+    const to = (path: string) => () => navigate(path)
+
+    return <AntdFooter ref={ref} style={footerStyle}><Flex style={{flexDirection: "row", justifyContent: "space-around"}}>
         <GlobalOutlined onClick={to("/map")}
                         style={{backgroundColor: Colors.RED_8, borderRadius: "15px", padding: "10px"}}/>
-        <PlusOutlined onClick={to("/edit/store_form")} style={{backgroundColor: Colors.RED_8, borderRadius: "15px", padding: "10px"}}/>
+        <PlusOutlined onClick={to("/edit/store_form")}
+                      style={{backgroundColor: Colors.RED_8, borderRadius: "15px", padding: "10px"}}/>
     </Flex></AntdFooter>;
 }

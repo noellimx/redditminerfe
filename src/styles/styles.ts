@@ -12,13 +12,13 @@ export const headerStyle: React.CSSProperties = {
     display: 'flex',
 };
 
-export const contentStyle: React.CSSProperties = {
+export const contentStyle = (height: number): React.CSSProperties => ({
     textAlign: 'center',
     minHeight: 120,
     width: '100%',
-    height: '100%',
+    height: height,
     color: '#fff',
     overflow: 'none',
     display: 'flex',
     backgroundColor: Colors.RED_1,
-};
+});

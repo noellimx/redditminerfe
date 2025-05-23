@@ -6,13 +6,13 @@ import {
     Select, Space, Typography,
     Divider, Flex,
 } from 'antd';
-import {useEffect} from "react";
 import {useState} from "react";
 import Fuse from 'fuse.js';
 
 import {FileTextOutlined, MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
 import {FloatButton} from "antd";
 import {AddOutlet, type NewOutletFieldForm, GetOutlet, type Outlet, UpdateOutlet} from "../../client/https.ts";
+import {Colors} from "../../colors";
 
 type FormStoreProps = {
     initInfo?: Info
@@ -24,22 +24,27 @@ type FormStoreProps = {
 export function OutletFormComponent({initInfo}: FormStoreProps) {
     const [form] = Form.useForm();
     const [similarOutlets, setSimilarOutlets] = useState<Outlet[]>([]);
+    const [fusedSimilarOutlets, setFusedSimilarOutlets] = useState<Outlet[]>([]);
 
 
     const [forExistingOutlet, setAsExistingOutlet] = useState(!!form.getFieldValue("id"));
 
     const outletForm = initInfo?.outlet_form;
     console.log(outletForm);
-    useEffect(() => {
-        // const outletForm = initInfo?.outlet_form;
 
-        // const nnp = outletForm?.product_names.map(item => {
-        //     return {"value" : item};
-        // }) || []
-        // form.setFieldValue(["menu"], nnp)
-
-        // console.log(form.getFieldsValue());
-    }, [form, initInfo])
+    const updateFused = (outlets: Outlet[]) => {
+        const os = new Fuse(outlets, {
+            findAllMatches: true,
+            threshold: 1,
+            includeScore: true,
+            keys: ["name"]
+        }).search(form.getFieldValue("name") || "").map(({item}) => item)
+        if (os.length == 0) {
+            setFusedSimilarOutlets(outlets)
+        } else {
+            setFusedSimilarOutlets(os)
+        }
+    }
 
 
     const focusOutlet = (outletId: number) => {
@@ -50,7 +55,7 @@ export function OutletFormComponent({initInfo}: FormStoreProps) {
                     const outlet = outlets[0]
 
                     const reviewLinks = outlet.review_links.map(l => {
-                        return ({"link": l.link, "platform" : l.platform, "creator" : l.creator })
+                        return ({"link": l.link, "platform": l.platform, "creator": l.creator})
                     })
                     form.setFieldValue(["review_links"], reviewLinks)
                     const officialLinks = outlet.official_links.map(l => {
@@ -81,24 +86,6 @@ export function OutletFormComponent({initInfo}: FormStoreProps) {
         }
     }
 
-    console.log(form.getFieldsValue());
-
-
-    const [fusedSimilarOutlets, setFusedSimilarOutlets] = useState<Outlet[]>([]);
-
-    const updateFused = (outlets: Outlet[]) => {
-        const os = new Fuse(outlets, {
-            findAllMatches: true,
-            threshold: 1,
-            includeScore: true,
-            keys: ["name"]
-        }).search(form.getFieldValue("name") || "").map(({item}) => item)
-        if (os.length == 0) {
-            setFusedSimilarOutlets(outlets)
-        } else {
-            setFusedSimilarOutlets(os)
-        }
-    }
 
     if (!initInfo || initInfo?.user_info == undefined) {
         return <a> Please login to use this page.</a>;
@@ -152,8 +139,10 @@ export function OutletFormComponent({initInfo}: FormStoreProps) {
             justifyContent: "start",
             width: "100%",
             height: "fit-content",
-            minHeight: "100%",
-            alignItems: 'center'
+            maxHeight: "100%",
+            overflowY: "auto",
+            alignItems: 'center',
+            scrollbarGutter: "stable",
         }}>
             <Form
                 form={form}
@@ -168,9 +157,8 @@ export function OutletFormComponent({initInfo}: FormStoreProps) {
 
                     // similar outlets [begin]. only for new form
                     if (!forExistingOutlet) {
-
-                        let _similarOutlets: Outlet[] = []
                         if (fields && fields[0]?.name[0] == "postal_code") {
+                            let _similarOutlets: Outlet[] = []
                             // get outlets if postal code valid
                             if (fields[0].validated && fields[0].errors?.length == 0 && fields[0].value.length == 6) {
                                 try {
@@ -180,20 +168,19 @@ export function OutletFormComponent({initInfo}: FormStoreProps) {
                                     const ea = e as Error;
                                     console.error(ea.message);
                                 }
-
                             }
                             setSimilarOutlets(_similarOutlets);
                             updateFused(_similarOutlets);
                         }
 
                         if (fields && fields[0]?.name[0] == "name") {
-                            console.log(`before ${similarOutlets}`);
                             updateFused(similarOutlets);
                         }
                     }
                 }}
             >
-                {forExistingOutlet ? <Divider style={{textAlign:"left"}}> Editing Outlet {`${form.getFieldValue('id')}`}</Divider> :
+                {forExistingOutlet ?
+                    <Divider style={{textAlign: "left"}}> Editing Outlet {`${form.getFieldValue('id')}`}</Divider> :
                     <Divider>New Outlet</Divider>}
                 <Form.Item label="Outlet Name" name="name"
                            rules={[{required: true, message: "Please enter outlet name"}]}>
@@ -225,20 +212,24 @@ export function OutletFormComponent({initInfo}: FormStoreProps) {
                 </Form.Item>
 
                 {fusedSimilarOutlets.length > 0 &&
-                    <>
-                        <Typography> There are similar outlets. Click to edit existing outlet: </Typography>
+                    <Card style={{borderRadius: "15px", position: "relative"}}>
+                        <div style={{position: "absolute", top: 0, right: 0}}>asasd</div>
+                        <Typography style={{fontWeight: "bold", textAlign: "start"}}> There are similar outlets.
+                            Click to edit existing outlet: </Typography>
                         <Flex style={{gap: "10px", flexDirection: "row"}}>
                             {
                                 fusedSimilarOutlets.map(o => {
-                                        return <Button type={"default"} style={{"width": "fit-content"}} onClick={() => {
-                                            focusOutlet(o.id)
-                                            setSimilarOutlets([])
-                                            setFusedSimilarOutlets([])
-                                        }} key={o.id}>{o.name}</Button>
+                                        return <Button type={"default"}
+                                                       style={{backgroundColor: Colors.RED_3, "width": "fit-content"}}
+                                                       onClick={() => {
+                                                           focusOutlet(o.id)
+                                                           setSimilarOutlets([])
+                                                           setFusedSimilarOutlets([])
+                                                       }} key={o.id}>{o.name}</Button>
                                     }
                                 )
                             }
-                        </Flex></>
+                        </Flex></Card>
                 }
                 <Divider>Menu</Divider>
 
@@ -304,7 +295,7 @@ export function OutletFormComponent({initInfo}: FormStoreProps) {
                                             rules={[{required: true, message: "please fill or remove empty creator"}]}
                                             style={{flex: 1}}
                                         >
-                                            <Select >
+                                            <Select>
                                                 {outletForm && outletForm?.platforms?.map(item => {
                                                     return <Select.Option value={item}> {item} </Select.Option>
                                                 })}

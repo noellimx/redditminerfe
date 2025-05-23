@@ -93,7 +93,7 @@ function FMarker({setFocusOutlet, outlet}: FMarkerProps) {
             </Button>
             <Flex style={{gap: "10px", alignItems: "center"}}>
                 <Typography style={{fontWeight: "bold"}}>
-                    {address ? `${address}}` : `${postal_code}`}
+                    {address ? `${address}` : `${postal_code}`}
                 </Typography>
             </Flex>
             {/*<Flex style={{alignItems: "center", gap: "10px"}}>*/}
