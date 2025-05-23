@@ -241,7 +241,7 @@ export function OutletFormComponent({initInfo}: FormStoreProps) {
                     </Select>
                 </Form.Item>
 
-                <Divider>Links</Divider>
+                <Divider>Content</Divider>
 
                 <Card style={{backgroundColor: "white"}}>
                     <Typography>Official Links</Typography>
