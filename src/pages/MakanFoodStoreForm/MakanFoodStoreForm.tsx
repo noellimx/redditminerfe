@@ -157,6 +157,8 @@ export function OutletFormComponent({initInfo}: FormStoreProps) {
 
                     // similar outlets [begin]. only for new form
                     if (!forExistingOutlet) {
+                        // const address = fields && fields[0]?.name[0] == "address";
+
                         if (fields && fields[0]?.name[0] == "postal_code") {
                             let _similarOutlets: Outlet[] = []
                             // get outlets if postal code valid

@@ -3,7 +3,7 @@ import '@ant-design/v5-patch-for-react-19';
 import "leaflet/dist/leaflet.css";
 
 
-import { type MenuProps} from 'antd';
+import {type MenuProps} from 'antd';
 import {Button, Dropdown, Flex, Layout, Typography} from 'antd';
 import React, {useEffect, useRef, useState,} from "react";
 import {UserOutlined} from "@ant-design/icons";
@@ -16,6 +16,7 @@ import {OutletFormComponent} from "./pages/MakanFoodStoreForm/MakanFoodStoreForm
 import {LogoutC, Ping} from "./client/https.ts";
 
 const {Header, Content} = Layout;
+import {Spin} from 'antd';
 
 
 const layoutStyle = {
@@ -36,7 +37,6 @@ const MKContent = ({height}: MKContentProps) => {
         <Outlet/>
     </Content>
 }
-
 
 
 interface MKHeaderProps {
@@ -73,38 +73,46 @@ const MKHeader = ({initInfo, ref}: MKHeaderProps) => {
 
     const isSessionActive = !(user_info == undefined || initInfo == null);
 
-    const navigate = useNavigate()
+    const navigate = useNavigate();
 
-    const [loggingIn, setLoggingIn] = useState<boolean>(false)
+    const [loggingIn, setLoggingIn] = useState<boolean>(false);
+
+
+    let Bar = <></>
+    if (initInfo === null || initInfo === undefined) {
+        Bar = <Button><Spin></Spin></Button>
+    } else {
+        Bar = isSessionActive ?
+            <>
+                <Dropdown menu={{
+                    items, onClick: // dont remove
+                        (e) => {
+                            const key = e.key
+                            navigate(key)
+                        }
+                }}>
+                    <Flex justify="end" style={{
+                        gap: "5px",
+                        border: "1px solid white",
+                        padding: "2px 10px 2px 10px",
+                        borderRadius: "5px"
+                    }}>
+                        <UserOutlined style={{maxHeight: "100%", fontSize: "20px"}}/>
+                        <Typography style={{color: '#fff', fontSize: '16px', alignItems: 'center'}}>
+                            {(initInfo?.user_info?.Gmails && initInfo?.user_info?.Gmails.length > 0) ? initInfo?.user_info?.Gmails[0] : JSON.stringify(initInfo?.user_info?.Id, null, 2)}
+                        </Typography>
+                    </Flex>
+                </Dropdown>
+            </> :
+            <Button onClick={() => {
+                setLoggingIn(true);
+            }} style={{}} type="primary"
+                    href={mkServerUrl + "/auth/google/login"}>{loggingIn ? "Logging In..." : "Google Login"}</Button>
+    }
 
     return <Header ref={ref} style={headerStyle}>
         <Flex style={{justifyContent: 'end', width: '100%', alignItems: 'center', paddingRight: "10px", gap: "10px"}}>
-            {isSessionActive ?
-                <>
-                    <Dropdown menu={{
-                        items, onClick: // dont remove
-                            (e) => {
-                                const key = e.key
-                                navigate(key)
-                            }
-                    }}>
-                        <Flex justify="end" style={{
-                            gap: "5px",
-                            border: "1px solid white",
-                            padding: "2px 10px 2px 10px",
-                            borderRadius: "5px"
-                        }}>
-                            <UserOutlined style={{maxHeight: "100%", fontSize: "20px"}}/>
-                            <Typography style={{color: '#fff', fontSize: '16px', alignItems: 'center'}}>
-                                {(initInfo?.user_info?.Gmails && initInfo?.user_info?.Gmails.length > 0) ? initInfo?.user_info?.Gmails[0] : JSON.stringify(initInfo?.user_info?.Id, null, 2)}
-                            </Typography>
-                        </Flex>
-                    </Dropdown>
-                </> :
-                <Button onClick={() => {
-                    setLoggingIn(true);
-                }} style={{}} type="primary"
-                        href={mkServerUrl + "/auth/google/login"}>{loggingIn ? "Logging In..." : "Google Login"}</Button>}
+            {Bar}
         </Flex>
     </Header>
 }
@@ -142,6 +150,26 @@ function AuthCallbackComponent() {
     return <></>;
 }
 
+interface LandingProps {
+    initInfo?: Info | undefined
+}
+
+function Landing({initInfo}: LandingProps) {
+
+    let Content = <></>;
+    if (initInfo == null || initInfo == undefined) {
+        Content = <Typography>Cold starting server....</Typography>;
+    }else {
+        Content = <Typography>Welcome</Typography>
+    }
+    return <Flex style={{
+        width: '100%',
+        height: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
+    }}>{Content}</Flex>;
+}
+
 function App() {
 
     const [initInfo, setInitInfo] = useState<Info | undefined>();
@@ -173,7 +201,9 @@ function App() {
         (async () => {
             // setInitInfo(await Ping(mkServerUrl))
             // console.log("setting info")
-            setInitInfo(await Ping(mkServerUrl))
+            setTimeout(async () => {
+                setInitInfo(await Ping(mkServerUrl))
+            }, 2000)
         })();
     }, [location.pathname])
 
@@ -197,30 +227,30 @@ function App() {
     console.log(`VITE_SERVER_URL=${import.meta.env.VITE_SERVER_URL}`);
     return (
 
-            <Layout style={layoutStyle}>
-                <MKHeader ref={headerRef} initInfo={initInfo} logout={logout}></MKHeader>
-                <Routes>
-                    <Route path="*" element={<MKContent height={contentHeight} initInfo={initInfo}></MKContent>}>
-                        <Route index element={<Typography>INDEX</Typography>}/>
-                        <Route path="settings" element={<Typography>SETTINGS</Typography>}/>
-                        <Route path="user" element={<Outlet />}>
-                            <Route index element={<Typography>USERPROFILE (INDEX)</Typography>}/>
-                            <Route path="profile" element={<Typography>USERPROFILE</Typography>}/>
-                            <Route path="settings" element={<Typography>USERSETTINGS</Typography>}/>
-                        </Route>
-                        <Route path="logout" element={<Logout logout={logout}/>}/>
-                        <Route path="map" element={<MakanMap initInfo={initInfo}></MakanMap>}/>
-                        <Route path="edit" element={<Outlet/>}>
-                            <Route path="menu" element={<><a>EDIT MENU </a></>}/>
-                            <Route path="store_form"
-                                   element={<OutletFormComponent initInfo={initInfo}>NEW FOOD
-                                       STORE</OutletFormComponent>}/>
-                        </Route>
-                        <Route path="auth_callback" element={<AuthCallbackComponent/>}/>
+        <Layout style={layoutStyle}>
+            <MKHeader ref={headerRef} initInfo={initInfo} logout={logout}></MKHeader>
+            <Routes>
+                <Route path="*" element={<MKContent height={contentHeight} initInfo={initInfo}></MKContent>}>
+                    <Route index element={<Landing initInfo={initInfo}/>}/>
+                    <Route path="settings" element={<Typography>SETTINGS</Typography>}/>
+                    <Route path="user" element={<Outlet/>}>
+                        <Route index element={<Typography>USERPROFILE (INDEX)</Typography>}/>
+                        <Route path="profile" element={<Typography>USERPROFILE</Typography>}/>
+                        <Route path="settings" element={<Typography>USERSETTINGS</Typography>}/>
                     </Route>
-                </Routes>
-                <Footer ref={footerRef}/>
-            </Layout>
+                    <Route path="logout" element={<Logout logout={logout}/>}/>
+                    <Route path="map" element={<MakanMap initInfo={initInfo}></MakanMap>}/>
+                    <Route path="edit" element={<Outlet/>}>
+                        <Route path="menu" element={<><a>EDIT MENU </a></>}/>
+                        <Route path="store_form"
+                               element={<OutletFormComponent initInfo={initInfo}>NEW FOOD
+                                   STORE</OutletFormComponent>}/>
+                    </Route>
+                    <Route path="auth_callback" element={<AuthCallbackComponent/>}/>
+                </Route>
+            </Routes>
+            <Footer initInfo={initInfo} ref={footerRef}/>
+        </Layout>
     )
 }
 
