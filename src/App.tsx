@@ -111,8 +111,14 @@ const MKHeader = ({initInfo, ref}: MKHeaderProps) => {
     }
 
     return <Header ref={ref} style={headerStyle}>
-        <Flex style={{justifyContent: 'end', width: '100%', alignItems: 'center', paddingRight: "10px", gap: "10px"}}>
-            {Bar}
+        <Flex style={{
+            justifyContent: 'end', width: '100%', alignItems: 'center', position: 'relative',
+            paddingRight: "10px", gap: "10px"
+        }}>
+            <Flex justify="center" style={{position: 'absolute', top: 0, left: 0, width: 'fit-content'}} >
+                {'🍴'}
+            </Flex>
+                {Bar}
         </Flex>
     </Header>
 }
@@ -159,7 +165,7 @@ function Landing({initInfo}: LandingProps) {
     let Content = <></>;
     if (initInfo == null || initInfo == undefined) {
         Content = <Typography>Cold starting server....</Typography>;
-    }else {
+    } else {
         Content = <Typography>Welcome</Typography>
     }
     return <Flex style={{
