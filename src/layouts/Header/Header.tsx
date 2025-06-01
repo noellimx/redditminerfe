@@ -1,7 +1,7 @@
 import React from "react";
 import {Colors} from "../../colors";
 import {Header as AntdHeader} from "antd/es/layout/layout";
-import {Flex} from "antd";
+import {Flex, Typography} from "antd";
 import type {Info} from "../../store";
 
 const headerStyle: React.CSSProperties = {
@@ -24,7 +24,8 @@ export const Header = ({ref, initInfo}: HeaderProps) => {
 
     return <AntdHeader ref={ref} style={headerStyle}><Flex
         className={"flex-header-container-123"}
-        style={{flexDirection: "row", width: "100%", justifyContent: "space-around"}}>
+        style={{flexDirection: "row",position:"relative", width: "100%", justifyContent: "end", alignItems: "center"}}>
+        <Flex style={{position:"absolute",height: "100%", alignItems:"center", top: 0, left: 10}}><Typography.Title>Reddit Trend Dashboard</Typography.Title></Flex>
         {initInfo ?<>
             {/*<GlobalOutlined onClick={to("/map")}*/}
             {/*                style={{backgroundColor: Colors.RED_8, borderRadius: "15px", padding: "10px"}}/>*/}
