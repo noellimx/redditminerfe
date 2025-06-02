@@ -4,7 +4,7 @@ import {type BumpData, type BumpDataM, RedditRankChart} from "../../components/C
 import {useEffect, useState} from "react";
 import {type GetStatistic, GetStatistics, Granularity} from "../../client/https.ts";
 import domtoimage from 'dom-to-image';
-import { timeFormat} from 'd3';
+import {timeFormat} from 'd3';
 import {Colors} from "../../colors";
 
 const {RangePicker} = DatePicker;
@@ -29,20 +29,29 @@ export function StatisticsPage({mkServerUrl}: { mkServerUrl: string }) {
 
     const fileName = `${sName}_${orderBy}_${t}_FROM_${from_time}_TO_${to_time}`
 
-    const _getParams =  {
+
+    const getParamsCsv = {
         subreddit_name: sName,
         rank_order_type: orderBy,
         rank_order_created_within_past: t,
         granularity: Granularity.Hour,
         from_time: from_time,
         to_time: to_time,
-    }
+    };
 
-    const getParamsJson = {..._getParams, backfill};
-    const getParamsCsv = {..._getParams, };
     useEffect(() => {
         (async () => {
-            const stats = await GetStatistics(mkServerUrl,getParamsJson, 'application/json') as GetStatistic[];
+            const _getParams = {
+                subreddit_name: sName,
+                rank_order_type: orderBy,
+                rank_order_created_within_past: t,
+                granularity: Granularity.Hour,
+                from_time: from_time,
+                to_time: to_time,
+            }
+            const getParamsJson = {..._getParams, backfill};
+
+            const stats = await GetStatistics(mkServerUrl, getParamsJson, 'application/json') as GetStatistic[];
 
             // stat -> datum
             // .title -> id
@@ -89,7 +98,12 @@ export function StatisticsPage({mkServerUrl}: { mkServerUrl: string }) {
 
 
     function downloadSVG() {
-        domtoimage.toSvg(document.getElementById('statsgraphcontainer-1'))
+
+        const e = document.getElementById('statsgraphcontainer-1')
+        if (!e) {
+            return
+        }
+        domtoimage.toSvg(e)
             .then(function (dataUrl: string) {
                 const link = document.createElement('a');
                 link.download = `${fileName}.svg`;
@@ -100,19 +114,19 @@ export function StatisticsPage({mkServerUrl}: { mkServerUrl: string }) {
 
 
     function downloadCSV() {
-            GetStatistics(mkServerUrl, getParamsCsv, 'text/csv').then(function (value) {
-                const v = value as string;
-                const blob = new Blob([v], { type: 'text/csv' });
-                const url = URL.createObjectURL(blob);
+        GetStatistics(mkServerUrl, getParamsCsv, 'text/csv').then(function (value) {
+            const v = value as string;
+            const blob = new Blob([v], {type: 'text/csv'});
+            const url = URL.createObjectURL(blob);
 
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${fileName}.csv`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            });
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${fileName}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
     }
 
 
@@ -148,7 +162,7 @@ export function StatisticsPage({mkServerUrl}: { mkServerUrl: string }) {
                                 p.set("from_time", start.toISOString());
                             }
                             if (end) {
-                                p.set("end_time", end.toISOString());
+                                p.set("to_time", end.toISOString());
                             }
                             console.log(p)
                             return p
