@@ -295,7 +295,7 @@ export const GetStatistics = async (mkServerUrl: string, params: GetStatisticsQu
     // console.log(Url.toString());
     const response = await fetch(Url, {
         method: "GET", credentials: 'include', headers: {
-            'Content-Type': contentType,
+            'Accept': contentType,
         },
     });
     if (!response.ok) {

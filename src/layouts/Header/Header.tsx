@@ -1,9 +1,9 @@
 import React from "react";
 import {Colors} from "../../colors";
 import {Header as AntdHeader} from "antd/es/layout/layout";
-import {Button, Flex, Typography} from "antd";
+import { Flex, Typography} from "antd";
 import type {Info} from "../../store";
-import {useNavigate, useNavigation} from "react-router";
+import {useNavigate, } from "react-router";
 import {HomeOutlined} from "@ant-design/icons";
 
 const headerStyle: React.CSSProperties = {
@@ -22,7 +22,7 @@ interface HeaderProps {
     initInfo?: Info | undefined
 }
 
-export const Header = ({ref, initInfo}: HeaderProps) => {
+export const Header = ({ref, }: HeaderProps) => {
     const nav = useNavigate();
     return <AntdHeader ref={ref} style={headerStyle}>
         <Flex
