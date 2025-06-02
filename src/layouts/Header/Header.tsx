@@ -1,8 +1,10 @@
 import React from "react";
 import {Colors} from "../../colors";
 import {Header as AntdHeader} from "antd/es/layout/layout";
-import {Flex, Typography} from "antd";
+import {Button, Flex, Typography} from "antd";
 import type {Info} from "../../store";
+import {useNavigate, useNavigation} from "react-router";
+import {HomeOutlined} from "@ant-design/icons";
 
 const headerStyle: React.CSSProperties = {
     textAlign: 'center',
@@ -21,19 +23,12 @@ interface HeaderProps {
 }
 
 export const Header = ({ref, initInfo}: HeaderProps) => {
-
-    return <AntdHeader ref={ref} style={headerStyle}><Flex
+    const nav = useNavigate();
+    return <AntdHeader ref={ref} style={headerStyle}>
+        <Flex
         className={"flex-header-container-123"}
         style={{flexDirection: "row",position:"relative", width: "100%", justifyContent: "end", alignItems: "center"}}>
-        <Flex style={{position:"absolute",height: "100%", alignItems:"center", top: 0, left: 10}}><Typography.Title>Reddit Trend Dashboard</Typography.Title></Flex>
-        {initInfo ?<>
-            {/*<GlobalOutlined onClick={to("/map")}*/}
-            {/*                style={{backgroundColor: Colors.RED_8, borderRadius: "15px", padding: "10px"}}/>*/}
-            {/*<PlusOutlined onClick={to("/edit/store_form")}*/}
-            {/*              style={{backgroundColor: Colors.RED_8, borderRadius: "15px", padding: "10px"}}/>*/}
-        </>: <>
-            {/*<Skeleton.Button active={true} shape={"circle"}></Skeleton.Button>*/}
-            {/*<Skeleton.Button active={true} shape={"circle"}></Skeleton.Button>*/}
-        </>}
+        <Flex style={{position:"absolute",height: "100%", alignItems:"center", top: 0, left: 10}}><Typography.Title >Reddit Trend Dashboard</Typography.Title></Flex>
+        <HomeOutlined style={{fontSize: 30, marginRight: 10}} onClick={()=> nav("/")}></HomeOutlined>
     </Flex></AntdHeader>;
 }

@@ -94,7 +94,7 @@ export function StatisticsPage({mkServerUrl}: { mkServerUrl: string }) {
             console.log(`len ${stats.length} stats.`)
         })();
 
-    }, [from_time, mkServerUrl, orderBy, sName, t, to_time])
+    }, [backfill, from_time, mkServerUrl, orderBy, sName, t, to_time])
 
 
     function downloadSVG() {
