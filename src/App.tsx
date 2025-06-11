@@ -169,7 +169,7 @@ function TaskPage({mkServerUrl}: TaskPageProps) {
                 </Form.Item>
                 <Form.Item label="Posts Age (t)" name="posts_created_within_past">
                     <Select placeholder="         " style={{width: "100px"}}>
-                        {["day", "hour", "month", "year"].map((v) => {
+                        {["day", "hour", "week", "month", "year"].map((v) => {
                             return <Select.Option value={v}>{v}</Select.Option>
                         })}
                     </Select>
