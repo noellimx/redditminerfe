@@ -1,455 +1,74 @@
-import {ResponsiveBump} from '@nivo/bump';
-import {timeFormat} from "d3";
+import { ResponsiveBump } from "@nivo/bump";
 
+type NivoBumpDatum = { x: string; y: number } | { x: string; y: null };
 
-const dataSample = [
-    {
-        "id": "Serie 1",
-        "data": [
-            {
-                "x": "2025-05-30 08:00:00",
-                "y": 7
-            },
-            {
-                "x": "2025-05-30 09:00:00",
-                "y": 1
-            },
-            {
-                "x": "2025-05-30 10:00:00",
-                "y": null,
-            },
-            {
-                "x": "2025-05-30 11:00:00",
-                "y": 4
-            },
-            {
-                "x": "2025-05-30 12:00:00",
-                "y": 8
-            },
-            {
-                "x": "2025-05-30 13:00:00",
-                "y": 1
-            }
-        ]
-    },
-    {
-        "id": "Serie 2",
-        "data": [
-            {
-                "x": "2025-05-30 08:00:00",
-                "y": 12
-            },
-            {
-                "x": "2025-05-30 09:00:00",
-                "y": 7
-            },
-            {
-                "x": "2025-05-30 10:00:00",
-                "y": 3
-            },
-            {
-                "x": "2025-05-30 11:00:00",
-                "y": 11
-            },
-            {
-                "x": "2025-05-30 12:00:00",
-                "y": 10
-            },
-            {
-                "x": "2025-05-30 13:00:00",
-                "y": 2
-            }
-        ]
-    },
-    {
-        "id": "Serie 3",
-        "data": [
-            {
-                "x": "2025-05-30 08:00:00",
-                "y": 4
-            },
-            {
-                "x": "2025-05-30 09:00:00",
-                "y": 11
-            },
-            {
-                "x": "2025-05-30 10:00:00",
-                "y": 2
-            },
-            {
-                "x": "2025-05-30 11:00:00",
-                "y": 8
-            },
-            {
-                "x": "2025-05-30 12:00:00",
-                "y": 12
-            },
-            {
-                "x": "2025-05-30 13:00:00",
-                "y": 3
-            }
-        ]
-    },
-    {
-        "id": "Serie 4",
-        "data": [
-            {
-                "x": "2025-05-30 08:00:00",
-                "y": 10,
-            },
-            {
-                "x": "2025-05-30 09:00:00",
-                "y": 8
-            },
-            {
-                "x": "2025-05-30 10:00:00",
-                "y": 9
-            },
-            {
-                "x": "2025-05-30 11:00:00",
-                "y": 6
-            },
-            {
-                "x": "2025-05-30 12:00:00",
-                "y": 9
-            },
-            {
-                "x": "2025-05-30 13:00:00",
-                "y": 4
-            }
-        ]
-    },
-    {
-        "id": "Serie 5",
-        "data": [
-            {
-                "x": "2025-05-30 08:00:00",
-                "y": 2
-            },
-            {
-                "x": "2025-05-30 09:00:00",
-                "y": 3
-            },
-            {
-                "x": "2025-05-30 10:00:00",
-                "y": 5
-            },
-            {
-                "x": "2025-05-30 11:00:00",
-                "y": 5
-            },
-            {
-                "x": "2025-05-30 12:00:00",
-                "y": 11
-            },
-            {
-                "x": "2025-05-30 13:00:00",
-                "y": 5
-            }
-        ]
-    },
-    {
-        "id": "Serie 6",
-        "data": [
-            {
-                "x": "2025-05-30 08:00:00",
-                "y": 6
-            },
-            {
-                "x": "2025-05-30 09:00:00",
-                "y": 5
-            },
-            {
-                "x": "2025-05-30 10:00:00",
-                "y": 6
-            },
-            {
-                "x": "2025-05-30 11:00:00",
-                "y": 9
-            },
-            {
-                "x": "2025-05-30 12:00:00",
-                "y": 2
-            },
-            {
-                "x": "2025-05-30 13:00:00",
-                "y": 6
-            }
-        ]
-    },
-    {
-        "id": "Serie 7",
-        "data": [
-            {
-                "x": "2025-05-30 08:00:00",
-                "y": 5
-            },
-            {
-                "x": "2025-05-30 09:00:00",
-                "y": 4
-            },
-            {
-                "x": "2025-05-30 10:00:00",
-                "y": 7
-            },
-            {
-                "x": "2025-05-30 11:00:00",
-                "y": 7
-            },
-            {
-                "x": "2025-05-30 12:00:00",
-                "y": 6
-            },
-            {
-                "x": "2025-05-30 13:00:00",
-                "y": 7
-            }
-        ]
-    },
-    {
-        "id": "Serie 8",
-        "data": [
-            {
-                "x": "2025-05-30 08:00:00",
-                "y": 1
-            },
-            {
-                "x": "2025-05-30 09:00:00",
-                "y": 12
-            },
-            {
-                "x": "2025-05-30 10:00:00",
-                "y": 12
-            },
-            {
-                "x": "2025-05-30 11:00:00",
-                "y": 10
-            },
-            {
-                "x": "2025-05-30 12:00:00",
-                "y": 5
-            },
-            {
-                "x": "2025-05-30 13:00:00",
-                "y": 8
-            }
-        ]
-    },
-    {
-        "id": "Serie 9",
-        "data": [
-            {
-                "x": "2025-05-30 08:00:00",
-                "y": 8
-            },
-            {
-                "x": "2025-05-30 09:00:00",
-                "y": 10
-            },
-            {
-                "x": "2025-05-30 10:00:00",
-                "y": 4
-            },
-            {
-                "x": "2025-05-30 11:00:00",
-                "y": 2
-            },
-            {
-                "x": "2025-05-30 12:00:00",
-                "y": 3
-            },
-            {
-                "x": "2025-05-30 13:00:00",
-                "y": 9
-            }
-        ]
-    },
-    {
-        "id": "Serie 10",
-        "data": [
-            {
-                "x": "2025-05-30 08:00:00",
-                "y": 9
-            },
-            {
-                "x": "2025-05-30 09:00:00",
-                "y": 9
-            },
-            {
-                "x": "2025-05-30 10:00:00",
-                "y": 11
-            },
-            {
-                "x": "2025-05-30 11:00:00",
-                "y": 3
-            },
-            {
-                "x": "2025-05-30 12:00:00",
-                "y": 7
-            },
-            {
-                "x": "2025-05-30 13:00:00",
-                "y": 10
-            }
-        ]
-    },
-    {
-        "id": "Serie 11",
-        "data": [
-            {
-                "x": "2025-05-30 08:00:00",
-                "y": 11
-            },
-            {
-                "x": "2025-05-30 09:00:00",
-                "y": 2
-            },
-            {
-                "x": "2025-05-30 10:00:00",
-                "y": 10
-            },
-            {
-                "x": "2025-05-30 11:00:00",
-                "y": 1
-            },
-            {
-                "x": "2025-05-30 12:00:00",
-                "y": 1
-            },
-            {
-                "x": "2025-05-30 13:00:00",
-                "y": 11
-            }
-        ]
-    },
-    {
-        "id": "Serie 12",
-        "data": [
-            {
-                "x": "2025-05-30 08:00:00",
-                "y": 3
-            },
-            {
-                "x": "2025-05-30 09:00:00",
-                "y": 6
-            },
-            {
-                "x": "2025-05-30 10:00:00",
-                "y": 8
-            },
-            {
-                "x": "2025-05-30 11:00:00",
-                "y": 12
-            },
-            {
-                "x": "2025-05-30 12:00:00",
-                "y": 4
-            },
-            {
-                "x": "2025-05-30 13:00:00",
-                "y": null
-            }
-        ]
-    },
-    {
-        "id": "Serie 13",
-        "data": [
-            {
-                "x": "2025-05-30 08:00:00",
-                "y": null
-            },
-            {
-                "x": "2025-05-30 09:00:00",
-                "y": null
-            },
-            {
-                "x": "2025-05-30 10:00:00",
-                "y": null
-            },
-            {
-                "x": "2025-05-30 11:00:00",
-                "y": null
-            },
-            {
-                "x": "2025-05-30 12:00:00",
-                "y": null
-            },
-            {
-                "x": "2025-05-30 13:00:00",
-                "y": 12
-            }
-        ]
-    }
-]
+type BumpDatum = NivoBumpDatum;
 
-
-type NivoBumpDatum = ({ x: string, y: number } | { x: string, y: null })
-type BumpDatum = NivoBumpDatum
 export type BumpData = {
-    id: string,
-    permalink?: string,
-    data: BumpDatum[]
-}[]
+  id: string;
+  permalink?: string;
+  data: BumpDatum[];
+}[];
 
 export type BumpDataM = {
-    [id: string]: BumpDatum[],
-}
-
+  [id: string]: BumpDatum[];
+};
 
 interface Props {
-    data: BumpData
+  data: BumpData;
 }
 
-export const RedditRankChart = ({data}: Props) => {
-    if (!data) {
-        return null
-    }
+export const RedditRankChart = ({ data }: Props) => {
+  if (!data) {
+    return null;
+  }
 
-    data = data.map((datum) => {
-        return {
-            ...datum,
-            data: datum.data.sort((a, b) => {
-                if (a.x < b.x) {
-                    return -1
-                }
-                if (a.x == b.x) {
-                    return 0
-                }
-                return 1
-            })
+  data = data.map((datum) => {
+    return {
+      ...datum,
+      data: datum.data.sort((a, b) => {
+        if (a.x < b.x) {
+          return -1;
         }
-    })
+        if (a.x == b.x) {
+          return 0;
+        }
+        return 1;
+      }),
+    };
+  });
 
-    return <ResponsiveBump
-        data={data}
-        axisBottom={{
-            tickRotation: 75,
-            tickValues: "auto", // Automatically choose tick values for time
-        }}
-        interpolation={"linear"}
-        xPadding={0}
-        animate={false}
-        theme={{tooltip: {container: {color: "black"}}}}
-        xOuterPadding={0}
-        colors={{scheme: 'category10'}}
-        lineWidth={3}
-        activeLineWidth={6}
-        inactiveLineWidth={3}
-        inactiveOpacity={0.8}
-        pointSize={2}
-        activePointSize={16}
-        inactivePointSize={0}
-        pointColor={{from: 'inherit'}}
-        pointBorderWidth={6}
-        activePointBorderWidth={3}
-        enableGridY={false}
-        axisTop={null}
-        pointBorderColor={{from: 'serie.color'}}
-        axisLeft={{legend: 'Ranking', legendOffset: -40,}}
-        margin={{top: 40, right: 160, bottom: 140, left: 60}}
-
-        onClick={(serie) => {
-            window.open("https://reddit.com" + serie.data.permalink)
-        }}
+  return (
+    <ResponsiveBump
+      data={data}
+      axisBottom={{
+        tickRotation: 75,
+        tickValues: "auto", // Automatically choose tick values for time
+      }}
+      interpolation={"linear"}
+      xPadding={0}
+      animate={false}
+      theme={{ tooltip: { container: { color: "black" } } }}
+      xOuterPadding={0}
+      colors={{ scheme: "category10" }}
+      lineWidth={3}
+      activeLineWidth={6}
+      inactiveLineWidth={3}
+      inactiveOpacity={0.8}
+      pointSize={2}
+      activePointSize={16}
+      inactivePointSize={0}
+      pointColor={{ from: "inherit" }}
+      pointBorderWidth={6}
+      activePointBorderWidth={3}
+      enableGridY={false}
+      axisTop={null}
+      pointBorderColor={{ from: "serie.color" }}
+      axisLeft={{ legend: "Ranking", legendOffset: -40 }}
+      margin={{ top: 40, right: 160, bottom: 140, left: 60 }}
+      onClick={(serie) => {
+        window.open("https://reddit.com" + serie.data.permalink);
+      }}
     />
+  );
 };
